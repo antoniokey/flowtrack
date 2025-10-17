@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientRMQ } from '@nestjs/microservices';
 
+import { Finance } from '@flowtrack/types';
+
 import { Observable } from 'rxjs';
 
-import { FINANCE_MICROSERVICE } from 'src/core/microservices';
-import { Finance } from 'src/types/finance';
+import { FINANCE_MICROSERVICE } from '../core/microservices';
 
 @Injectable()
 export class FinanceService {

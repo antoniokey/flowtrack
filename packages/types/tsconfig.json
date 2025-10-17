@@ -1,5 +1,5 @@
 {
-  "extends": "@flowtrack/typescript-config/react-library.json",
+  "extends": "@flowtrack/typescript-config/base.json",
   "compilerOptions": {
     "outDir": "dist"
   },

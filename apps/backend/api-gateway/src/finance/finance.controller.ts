@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 
 import { Observable } from 'rxjs';
 
-import { Finance } from 'src/types/finance';
+import { Finance } from '@flowtrack/types';
 
 import { FinanceService } from './finance.service';
 

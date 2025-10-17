@@ -1,0 +1,16 @@
+{
+  "name": "@flowtrack/constants",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@flowtrack/typescript-config": "*"
+  }
+}

@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "build-workspaces": "yarn workspace @flowtrack/constants build",
+    "dev": "yarn build-workspaces && turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"
@@ -20,6 +21,7 @@
   "workspaces": [
     "apps/frontend/*",
     "apps/backend/*",
-    "packages/*"
+    "packages/*",
+    "packages/config/*"
   ]
 }
