@@ -3,6 +3,7 @@ import type { NextConfig } from 'next';
 import NextFederationPlugin from '@module-federation/nextjs-mf';
 
 const nextConfig: NextConfig = {
+  transpilePackages: ['@flowtrack/ui'],
   webpack(config) {
     config.plugins.push(
       new NextFederationPlugin({

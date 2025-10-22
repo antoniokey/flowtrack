@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@flowtrack/ui": "*",
     "@module-federation/nextjs-mf": "^8.8.42",
     "next": "15.5.6",
     "react": "19.1.0",

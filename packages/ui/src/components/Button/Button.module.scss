@@ -1,0 +1,43 @@
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-base-8) var(--spacing-base-10);
+  border-radius: 6px;
+  cursor: pointer;
+	box-shadow: none;
+	transition: all 0.1s ease;
+  border: 1px solid var(--content-low);  
+
+  &:hover {
+    box-shadow: none;
+    transform: scale(1.01);
+  }
+
+  &:active {
+    box-shadow: none;
+    transform: scale(0.98);
+  }
+
+  &.primary {
+    color: var(--content-base);
+    background-color: var(--primary-base);
+  }
+
+  &.secondary {
+    color: var(--primary-base);
+    background-color: var(--secondary-base);
+  }
+
+  &.small {
+    font-size: 14px;
+  }
+
+  &.medium {
+    font-size: 16px;
+  }
+
+  &.large {
+    font-size: 20px;
+  }
+}
