@@ -1,5 +1,8 @@
 {
   "welcome_title": "Wecome to the flowtrack app",
+  "common": {
+    "submit_button": "Submit"
+  },
   "login": {
     "button": "Login",
     "modal": {
