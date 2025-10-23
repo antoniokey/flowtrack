@@ -1,0 +1,16 @@
+{
+  "welcome_title": "Wecome to the flowtrack app",
+  "login": {
+    "button": "Login",
+    "modal": {
+      "title": "Login"
+    }
+  },
+  "register": {
+    "note": "Do not have an account?",
+    "button":  "Create an account",
+    "modal": {
+      "title": "Register"
+    }
+  }
+}
