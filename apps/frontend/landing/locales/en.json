@@ -1,7 +1,17 @@
 {
   "welcome_title": "Wecome to the flowtrack app",
-  "common": {
-    "submit_button": "Submit"
+  "buttons": {
+    "submit": "Submit"
+  },
+  "fields": {
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "confirm_password": "Confirm password"
+  },
+  "errors": {
+    "required": "This field is required",
+    "email": "Invalid email address"
   },
   "login": {
     "button": "Login",
