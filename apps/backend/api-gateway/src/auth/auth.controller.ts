@@ -1,7 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
 import { LoginResponse, User } from '@flowtrack/types';
 
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 
 import { AuthService } from './auth.service';
 
@@ -11,11 +11,23 @@ export class AuthController {
 
   @Post('login')
   login(@Body() user: Omit<User, 'password'>): Observable<LoginResponse> {
-    return this.authService.login(user);
+    return this.authService
+      .login(user)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new BadRequestException(error.message)),
+        ),
+      );
   }
 
   @Post('register')
   register(@Body() user: User): Observable<Omit<User, 'password'>> {
-    return this.authService.register(user);
+    return this.authService
+      .register(user)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new BadRequestException(error.message)),
+        ),
+      );
   }
 }

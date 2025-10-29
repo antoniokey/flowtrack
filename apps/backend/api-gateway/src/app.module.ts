@@ -3,7 +3,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 
 import { FinanceController } from './finance/finance.controller';
 import { FinanceService } from './finance/finance.service';
-import { AUTH_MICROSERVICE, FINANCE_MICROSERVICE } from './core/microservices';
+import {
+  AUTH_MICROSERVICE,
+  FINANCE_MICROSERVICE,
+} from './core/constants/microservices';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 

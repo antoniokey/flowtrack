@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { LoginResponse } from '@flowtrack/types';
+import { RpcException } from '@nestjs/microservices';
 
 import * as bcrypt from 'bcrypt';
+
+import { LoginResponse } from '@flowtrack/types';
 
 import { CreateUserDto } from 'src/auth/dto/create-user.dto';
 import { User } from 'src/user/entities/user.entity';
@@ -23,13 +25,19 @@ export class AuthService {
     const user = await this.userService.findOneByEmail(email);
 
     if (!user) {
-      throw new BadRequestException('User not found');
+      throw new RpcException({
+        statusCode: 404,
+        message: 'User not found',
+      });
     }
 
     const isPasswordMatch = bcrypt.compareSync(password, user.password);
 
     if (!isPasswordMatch) {
-      throw new BadRequestException('Password is incorrect');
+      throw new RpcException({
+        statusCode: 400,
+        message: 'Password is incorrect',
+      });
     }
 
     const { password: userPassword, ...restUser } = user;

@@ -5,7 +5,7 @@ import { Finance } from '@flowtrack/types';
 
 import { Observable } from 'rxjs';
 
-import { FINANCE_MICROSERVICE } from '../core/microservices';
+import { FINANCE_MICROSERVICE } from '../core/constants/microservices';
 
 @Injectable()
 export class FinanceService {

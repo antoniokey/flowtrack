@@ -2,6 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { useMutation } from '@tanstack/react-query';
+
 import Modal from '@flowtrack/ui/components/Modal/Modal';
 import TextInputField from '@flowtrack/ui/components/TextInputField/TextInputField';
 import Button from '@flowtrack/ui/components/Button/Button';
@@ -24,12 +26,34 @@ interface RegisterModalFormFields {
 const RegisterModal = ({ setIsRegisterModalOpened }: RegisterModalProps) => {
   const { t } = useTranslation();
 
+  const registerMutation = useMutation({
+    mutationFn: async (values: Omit<RegisterModalFormFields, 'confirmPassword'>) => {
+      try {
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(values),
+        });
+  
+        return res.json();
+      } catch(error) {
+        throw error;
+      }
+    },
+  });
+
   const methods = useForm<RegisterModalFormFields>();
 
   const { handleSubmit } = methods;
 
-  const onRegisterSubmit = (values: unknown) => {
-    console.log(values);
+  const onRegisterSubmit = (values: RegisterModalFormFields) => {
+    const { confirmPassword, ...createdUser } = values;
+
+    registerMutation.mutate(createdUser, {
+      onError: (error) => console.log(error),
+    });
   }
 
   return (

@@ -4,7 +4,7 @@ import { LoginResponse, User } from '@flowtrack/types';
 
 import { Observable } from 'rxjs';
 
-import { AUTH_MICROSERVICE } from 'src/core/microservices';
+import { AUTH_MICROSERVICE } from 'src/core/constants/microservices';
 
 @Injectable()
 export class AuthService {

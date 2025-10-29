@@ -2,6 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { useMutation } from '@tanstack/react-query';
+
 import Modal from '@flowtrack/ui/components/Modal/Modal';
 import TextInputField from '@flowtrack/ui/components/TextInputField/TextInputField';
 import Button from '@flowtrack/ui/components/Button/Button';
@@ -22,12 +24,37 @@ interface LoginModalFormFields {
 const LoginModal = ({ setIsLoginModalOpened }: LoginModalProps) => {
   const { t } = useTranslation();
 
+  const mutation = useMutation({
+    mutationFn: async (values: LoginModalFormFields) => {
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(values),
+        });
+  
+        return res.json();
+      } catch(error) {
+        throw error;
+      }
+    },
+  });
+
   const methods = useForm<LoginModalFormFields>({ mode: 'onChange' });
 
   const { handleSubmit } = methods;
 
-  const onLoginSubmit = (values: unknown) => {
-    console.log(values);
+  const onLoginSubmit = async (values: LoginModalFormFields) => {
+    mutation.mutate(values, {
+      onSuccess: (data) => {
+        localStorage.setItem('access_token', data.access_token);
+      },
+      onError: (error) => {
+        console.error(error);
+      },
+    });
   }
 
   return (
