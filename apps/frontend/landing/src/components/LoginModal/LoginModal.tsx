@@ -1,10 +1,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormProvider, useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
+import { jwtDecode } from 'jwt-decode';
 
 import { useMutation } from '@tanstack/react-query';
 
-import useStore from '@flowtrack/store';
+import { useUserStore } from '@flowtrack/store';
 
 import Modal from '@flowtrack/ui/components/Modal/Modal';
 import TextInputField from '@flowtrack/ui/components/TextInputField/TextInputField';
@@ -13,7 +15,6 @@ import Button from '@flowtrack/ui/components/Button/Button';
 import styles from './LoginModal.module.scss';
 import { ButtonSize, ButtonType, ButtonVariant } from '../../../../../../packages/ui/src/components/Button/constants';
 import { TextInputFieldType } from '../../../../../../packages/ui/src/components/TextInputField/constants';
-import { jwtDecode } from 'jwt-decode';
 
 interface LoginModalProps {
   setIsLoginModalOpened: (flag: boolean) => void;
@@ -27,23 +28,25 @@ interface LoginModalFormFields {
 const LoginModal = ({ setIsLoginModalOpened }: LoginModalProps) => {
   const { t } = useTranslation();
 
-  const { setUser } = useStore();
+  const { setUser } = useUserStore();
 
   const mutation = useMutation({
     mutationFn: async (values: LoginModalFormFields) => {
-      try {
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(values),
-        });
-  
-        return res.json();
-      } catch(error) {
-        throw error;
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message);
       }
+
+      return data;
     },
   });
 
@@ -58,9 +61,7 @@ const LoginModal = ({ setIsLoginModalOpened }: LoginModalProps) => {
 
         setUser(jwtDecode(data.access_token));
       },
-      onError: (error) => {
-        console.error(error);
-      },
+      onError: (error) => toast(error.message, { type: 'error' }),
     });
   }
 

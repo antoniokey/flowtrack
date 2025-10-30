@@ -11,7 +11,8 @@
   },
   "errors": {
     "required": "This field is required",
-    "email": "Invalid email address"
+    "email": "Invalid email address",
+    "confirm_password": "Passwords do not match"
   },
   "login": {
     "button": "Login",
@@ -22,6 +23,7 @@
   "register": {
     "note": "Do not have an account?",
     "button":  "Create an account",
+    "success": "User was successfully registered! You can now login.",
     "modal": {
       "title": "Register"
     }

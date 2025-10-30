@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormProvider, useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 
 import { useMutation } from '@tanstack/react-query';
 
@@ -14,6 +15,7 @@ import { TextInputFieldType } from '../../../../../../packages/ui/src/components
 
 interface RegisterModalProps {
   setIsRegisterModalOpened: (flag: boolean) => void;
+  setIsLoginModalOpened: (flag: boolean) => void;
 }
 
 interface RegisterModalFormFields {
@@ -23,36 +25,44 @@ interface RegisterModalFormFields {
   confirmPassword: string;
 }
 
-const RegisterModal = ({ setIsRegisterModalOpened }: RegisterModalProps) => {
+const RegisterModal = ({ setIsRegisterModalOpened, setIsLoginModalOpened }: RegisterModalProps) => {
   const { t } = useTranslation();
 
   const registerMutation = useMutation({
     mutationFn: async (values: Omit<RegisterModalFormFields, 'confirmPassword'>) => {
-      try {
-        const res = await fetch('/api/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(values),
-        });
-  
-        return res.json();
-      } catch(error) {
-        throw error;
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message);
       }
+
+      return data;
     },
   });
 
   const methods = useForm<RegisterModalFormFields>();
 
-  const { handleSubmit } = methods;
+  const { getValues, handleSubmit } = methods;
 
   const onRegisterSubmit = (values: RegisterModalFormFields) => {
     const { confirmPassword, ...createdUser } = values;
 
     registerMutation.mutate(createdUser, {
-      onError: (error) => console.log(error),
+      onSuccess: () => {
+        toast(t('register.success'), { type: 'success' });
+
+        setIsRegisterModalOpened(false);
+        setIsLoginModalOpened(true);
+      },
+      onError: (error) => toast(error.message, { type: 'error' }),
     });
   }
 
@@ -88,6 +98,17 @@ const RegisterModal = ({ setIsRegisterModalOpened }: RegisterModalProps) => {
               name="confirmPassword"
               label={t('fields.confirm_password')}
               type={TextInputFieldType.Password}
+              validation={{
+                validate: {
+                  passwordMatch: (confirmPassword: string) => {
+                    if (confirmPassword !== getValues('password')) {
+                      return t('errors.confirm_password');
+                    }
+
+                    return true;
+                  }
+                } as any,
+              }}
             />
           </Modal.Body>
           <Modal.Footer>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { I18nextProvider, useTranslation } from 'react-i18next';
+import { ToastContainer } from 'react-toastify';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -62,9 +63,20 @@ export default function LandingPage() {
             <LoginModal setIsLoginModalOpened={setIsLoginModalOpened} />
           )}
           {isRegisterModalOpened && (
-            <RegisterModal setIsRegisterModalOpened={setIsRegisterModalOpened} />
+            <RegisterModal
+              setIsRegisterModalOpened={setIsRegisterModalOpened}
+              setIsLoginModalOpened={setIsLoginModalOpened}
+            />
           )}
         </div>
+
+        <ToastContainer
+          position="bottom-center"
+          autoClose={3000}
+          hideProgressBar
+          closeOnClick
+          pauseOnHover
+        />
       </QueryClientProvider>
     </I18nextProvider>
   );
