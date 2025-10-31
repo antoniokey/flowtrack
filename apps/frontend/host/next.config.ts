@@ -3,6 +3,7 @@ import type { NextConfig } from 'next';
 import NextFederationPlugin from '@module-federation/nextjs-mf';
 
 const nextConfig: NextConfig = {
+  transpilePackages: ['@flowtack/router'],
   webpack(config) {
     config.plugins.push(
       new NextFederationPlugin({
@@ -10,10 +11,7 @@ const nextConfig: NextConfig = {
         filename: 'static/chunks/remoteEntry.js',
         remotes: {
           landing: `landing@http://localhost:3002/_next/static/chunks/remoteEntry.js`,
-        },
-        shared: {
-          react: { singleton: true },
-          'react-dom': { singleton: true },
+          dashboard: 'dashboard@http://localhost:3003/_next/static/chunks/remoteEntry.js',
         },
         extraOptions: {},
       }),
