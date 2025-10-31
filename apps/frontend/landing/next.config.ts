@@ -12,10 +12,6 @@ const nextConfig: NextConfig = {
         exposes: {
           './LandingPage': './src/pages/index.tsx',
         },
-        shared: {
-          react: { singleton: true },
-          'react-dom': { singleton: true },
-        },
         extraOptions: {},
       }),
     );

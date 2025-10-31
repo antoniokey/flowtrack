@@ -7,10 +7,10 @@ import { jwtDecode } from 'jwt-decode';
 import { useMutation } from '@tanstack/react-query';
 
 import { useUserStore } from '@flowtrack/store';
-
 import Modal from '@flowtrack/ui/components/Modal/Modal';
 import TextInputField from '@flowtrack/ui/components/TextInputField/TextInputField';
 import Button from '@flowtrack/ui/components/Button/Button';
+import { useFlowtrackRouter } from '@flowtrack/router';
 
 import styles from './LoginModal.module.scss';
 import { ButtonSize, ButtonType, ButtonVariant } from '../../../../../../packages/ui/src/components/Button/constants';
@@ -27,6 +27,8 @@ interface LoginModalFormFields {
 
 const LoginModal = ({ setIsLoginModalOpened }: LoginModalProps) => {
   const { t } = useTranslation();
+
+  const router = useFlowtrackRouter(); 
 
   const { setUser } = useUserStore();
 
@@ -60,6 +62,8 @@ const LoginModal = ({ setIsLoginModalOpened }: LoginModalProps) => {
         localStorage.setItem('access_token', data.access_token);
 
         setUser(jwtDecode(data.access_token));
+
+        router.push('dashboard');
       },
       onError: (error) => toast(error.message, { type: 'error' }),
     });

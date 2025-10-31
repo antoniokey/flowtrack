@@ -1,0 +1,11 @@
+{
+  "name": "@flowtrack/router",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^19.2.0",
+    "typescript": "^5.9.3"
+  }
+}
