@@ -7,6 +7,8 @@ import Button from '@flowtrack/ui/components/Button/Button';
 
 import { ButtonSize, ButtonType, ButtonVariant } from '../../../../../../../packages/ui/src/components/Button/constants';
 
+import styles from './Header.module.scss';
+
 const LayoutHeader = () => {
   const { t } = useTranslation();
 
@@ -15,11 +17,12 @@ const LayoutHeader = () => {
   const router = useRouter();
 
   return (
-    <div>
+    <div className={styles.layoutHeader}>
       <Button
         variant={ButtonVariant.Secondary}
         size={ButtonSize.Medium}
         type={ButtonType.Submit}
+        className={styles.logoutButton}
         onClick={() => {
           localStorage.removeItem('access_token');
 

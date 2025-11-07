@@ -1,0 +1,9 @@
+.layoutHeader {
+  grid-column: 2;
+  grid-row: 1;
+  padding: var(--spacing-base-10);
+}
+
+.logoutButton {
+  justify-self: end;
+}

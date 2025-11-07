@@ -1,5 +1,8 @@
 {
   "header": {
     "logout_button": "Logout"
+  },
+  "sidebar_options": {
+    "dashboard": "Dashboard"
   }
 }
