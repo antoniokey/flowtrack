@@ -63,7 +63,9 @@ const LoginModal = ({ setIsLoginModalOpened }: LoginModalProps) => {
 
         setUser(jwtDecode(data.access_token));
 
-        router.push('dashboard');
+        router.push('/dashboard');
+        
+        setIsLoginModalOpened(false);
       },
       onError: (error) => toast(error.message, { type: 'error' }),
     });

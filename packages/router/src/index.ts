@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react';
 
 interface IFlowtrackRouterContext {
   push: (url: string) => void;
-  replace?: (url: string) => void;
+  replace: (url: string) => void;
   back?: () => void;
   pathname?: string;
   query?: Record<string, any>;
