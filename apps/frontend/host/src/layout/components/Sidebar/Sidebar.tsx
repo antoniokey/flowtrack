@@ -1,37 +1,77 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GoHome } from "react-icons/go";
+import { GoHome } from 'react-icons/go';
+import { TfiArrowCircleLeft } from 'react-icons/tfi';
+import { usePathname, useRouter } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+
+import clsx from 'clsx';
 
 import styles from './Sidebar.module.scss';
 import { SIDEBAR_OPTIONS } from './constants';
-import Link from 'next/link';
-import clsx from 'clsx';
-import { usePathname } from 'next/navigation';
-import Image from 'next/image';
-
+import { SidebarOption } from './types';
 
 const LayoutSidebar = () => {
   const { t } = useTranslation();
 
+  const [isSidebarOpened, setIsSidebarOpened] = useState(true);
+
   const pathname = usePathname();
+  const router = useRouter();
+
+  const onSidebarOptionClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, option: SidebarOption) => {
+    event.preventDefault();
+
+    if (pathname !== option.path) {
+      router.push(option.path);
+    }
+  };
 
   return (
-    <div className={styles.layoutSidebar}>
+    <div className={clsx(styles.layoutSidebar, {
+      [styles.sidebarCollapsed]: !isSidebarOpened,
+      [styles.sidebarOpened]: isSidebarOpened,
+    })}>
+      <TfiArrowCircleLeft
+        className={clsx(styles.arrow, {
+          [styles.arrowCollapsed]: !isSidebarOpened,
+          [styles.arrowOpened]: isSidebarOpened,
+        })}
+        onClick={() => setIsSidebarOpened(!isSidebarOpened)} />
+
       <div className={styles.appInfo}>
-        <Image src="/images/logo.png" alt="App logo" width={200} height={100} className={styles.logo} />
+        <Image
+          src={isSidebarOpened ? '/images/logo.png' : '/images/logo-image.png'}
+          alt='App logo'
+          width={isSidebarOpened ? 200 : 90}
+          height={isSidebarOpened ? 100 : 50}
+          className={clsx(styles.logo, {
+            [styles.sidebarClosedLogo]: !isSidebarOpened,
+          })}
+        />
       </div>
 
-      <div className={styles.sidebarOptions}>
+      <div className={clsx(styles.sidebarOptions, {
+        [styles.sidebarClosedOptions]: !isSidebarOpened,
+      })}>
         {SIDEBAR_OPTIONS.map(option => (
           <Link
             key={option.key}
             href={option.path}
             className={clsx(styles.sidebarOption, {
               [styles.activeSidebarOption]: pathname === option.path,
+              [styles.sidebarClosedOption]: !isSidebarOpened,
             })}
+            onClick={event => onSidebarOptionClick(event, option)}
           >
             <GoHome />
-            <span>{t(`sidebar_options.${option.key}`)}</span>
+            {isSidebarOpened && (
+              <span>{t(`sidebar_options.${option.key}`)}</span>
+            )}
+            <div className={styles.tooltip}>
+              {t(`sidebar_options.${option.key}`)}
+            </div>
           </Link>
         ))}
       </div>
