@@ -10,13 +10,13 @@ import { LoginUserDto } from './dto/login-user.dto';
 
 @Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @MessagePattern('login')
   async login(@Payload() payload: LoginUserDto): Promise<LoginResponse> {
     const user = await this.authService.validateUser(
-      payload.email,
-      payload.password,
+      payload.data.email,
+      payload.data.password,
     );
 
     return this.authService.login(user);

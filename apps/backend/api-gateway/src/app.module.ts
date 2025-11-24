@@ -40,4 +40,4 @@ import { AuthService } from './auth/auth.service';
   controllers: [AuthController, FinanceController],
   providers: [AuthService, FinanceService],
 })
-export class AppModule {}
+export class AppModule { }
