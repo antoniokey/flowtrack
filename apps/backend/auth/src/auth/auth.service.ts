@@ -26,8 +26,10 @@ export class AuthService {
 
     if (!user) {
       throw new RpcException({
-        statusCode: 404,
-        message: 'User not found',
+        error: {
+          statusCode: 404,
+          message: 'User not found',
+        },
       });
     }
 
@@ -35,8 +37,10 @@ export class AuthService {
 
     if (!isPasswordMatch) {
       throw new RpcException({
-        statusCode: 400,
-        message: 'Password is incorrect',
+        error: {
+          statusCode: 400,
+          message: 'Password is incorrect',
+        },
       });
     }
 

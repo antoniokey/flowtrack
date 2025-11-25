@@ -1,30 +1,26 @@
-import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
 
-import {
-  LogEventContext as ILogEventContext,
-  LoginResponse,
-} from '@flowtrack/types';
+import { LogEventContext as ILogEventContext } from '@flowtrack/types';
 
-import { catchError, Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { LogEventContext } from 'src/core/decorators/log-event-context.decorator';
 
 import { AuthService } from './auth.service';
 import {
-  LoginUserBadRequestDto,
-  LoginUserDto,
   LoginUserResponseDto,
-} from './dto/login-user.dto';
-import {
+  LoginUserBadRequestDto,
   CreateUserBadRequestDto,
-  CreateUserDto,
   CreateUserResponseDto,
-} from './dto/create-user.dto';
+  LoginUserDto,
+  CreateUserDto,
+} from './dto/auth.dto';
+import { CreateUserResponse, LoginUserResponse } from './types/auth.types';
 
 @Controller()
 export class AuthController {
@@ -35,18 +31,13 @@ export class AuthController {
     description: 'Login failed',
     type: LoginUserBadRequestDto,
   })
+  @HttpCode(200)
   @Post('login')
   login(
     @LogEventContext() logEventContext: ILogEventContext,
     @Body() user: LoginUserDto,
-  ): Observable<LoginResponse> {
-    return this.authService
-      .login(user, logEventContext)
-      .pipe(
-        catchError((error) =>
-          throwError(() => new BadRequestException(error.message)),
-        ),
-      );
+  ): Observable<LoginUserResponse> {
+    return this.authService.login(user, logEventContext);
   }
 
   @ApiCreatedResponse({
@@ -61,13 +52,7 @@ export class AuthController {
   register(
     @LogEventContext() logEventContext: ILogEventContext,
     @Body() user: CreateUserDto,
-  ): Observable<CreateUserResponseDto> {
-    return this.authService
-      .register(user, logEventContext)
-      .pipe(
-        catchError((error) =>
-          throwError(() => new BadRequestException(error.message)),
-        ),
-      );
+  ): Observable<CreateUserResponse> {
+    return this.authService.register(user, logEventContext);
   }
 }
