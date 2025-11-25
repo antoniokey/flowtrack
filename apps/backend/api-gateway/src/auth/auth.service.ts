@@ -1,11 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientRMQ } from '@nestjs/microservices';
 
-import { LogEventContext, LoginResponse, User } from '@flowtrack/types';
+import { LogEventContext } from '@flowtrack/types';
 
 import { Observable } from 'rxjs';
 
 import { AUTH_MICROSERVICE } from 'src/core/constants/microservices';
+
+import { LoginUserDto, LoginUserResponseDto } from './dto/login-user.dto';
+import { CreateUserDto, CreateUserResponseDto } from './dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,9 +17,9 @@ export class AuthService {
   ) { }
 
   login(
-    user: Omit<User, 'password'>,
+    user: LoginUserDto,
     logEventContext: LogEventContext,
-  ): Observable<LoginResponse> {
+  ): Observable<LoginUserResponseDto> {
     return this.authMicroservice.send('login', {
       data: { ...user },
       logEvent: {
@@ -27,9 +30,9 @@ export class AuthService {
   }
 
   register(
-    user: User,
+    user: CreateUserDto,
     logEventContext: LogEventContext,
-  ): Observable<Omit<User, 'password'>> {
+  ): Observable<CreateUserResponseDto> {
     return this.authMicroservice.send('register', {
       data: { ...user },
       logEvent: {
