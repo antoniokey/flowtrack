@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package user;
+
+service UsersService {
+  rpc FindOneBy (UserFindOneBy) returns (UserFindOneByResponse) {}
+  rpc CreateOne (UserCreateOne) returns (UserCreateOneResponse) {}
+}
+
+message UserFindOneBy {
+  string email = 1;
+}
+
+message UserCreateOne {
+  string email = 1;
+  string name = 2;
+  string password = 3;
+}
+
+message UserFindOneByResponse {
+  string id = 1;
+  string email = 2;
+  string name = 3;
+  string password = 4;
+}
+
+message UserCreateOneResponse {
+  string id = 1;
+  string email = 2;
+  string name = 3;
+}

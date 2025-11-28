@@ -2,25 +2,28 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RpcException } from '@nestjs/microservices';
 
-import * as bcrypt from 'bcrypt';
+import { WithoutPasswordUser, User as IUser } from '@flowtrack/types';
+
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 import { User } from './entities/user.entity';
-import { CreateUserDto } from '../auth/dto/create-user.dto';
 
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) { }
 
-  findOneByEmail(email: string): Promise<User> {
-    return this.userRepository.findOneBy({ email });
+  async findOneBy(filter: unknown): Promise<IUser> {
+    return this.userRepository.findOneBy(filter);
   }
 
-  async create(user: CreateUserDto): Promise<User> {
+  async createOne(user: IUser): Promise<WithoutPasswordUser> {
+    const { email, name, password } = user;
+
     const existingUser = await this.userRepository.exists({
-      where: { email: user.data.email },
+      where: { email },
     });
 
     if (existingUser) {
@@ -30,8 +33,8 @@ export class UserService {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(user.data.password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    return this.userRepository.save({ ...user.data, password: hashedPassword });
+    return this.userRepository.save({ email, name, password: hashedPassword });
   }
 }

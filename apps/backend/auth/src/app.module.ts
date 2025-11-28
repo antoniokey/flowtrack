@@ -5,7 +5,6 @@ import { ClientRMQ, ClientsModule, Transport } from '@nestjs/microservices';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 import { AuthModule } from './auth/auth.module';
-import { User } from './user/entities/user.entity';
 import { LOGGER_MICROSERVICE } from './core/constants/constants';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 
@@ -35,7 +34,7 @@ import { AuthInterceptor } from './core/interceptors/auth.interceptor';
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_DB'),
-        entities: [User],
+        entities: [],
         synchronize: true,
       }),
     }),

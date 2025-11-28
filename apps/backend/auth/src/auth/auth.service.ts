@@ -1,28 +1,31 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RpcException } from '@nestjs/microservices';
+import { ClientGrpc, RpcException } from '@nestjs/microservices';
 
 import * as bcrypt from 'bcrypt';
+import { firstValueFrom } from 'rxjs';
 
-import { LoginResponse } from '@flowtrack/types';
+import { CreateUserResponse, LoginResponse, User } from '@flowtrack/types';
 
 import { CreateUserDto } from 'src/auth/dto/create-user.dto';
-import { User } from 'src/user/entities/user.entity';
-import { UserService } from 'src/user/user.service';
+import { USER_MICROSERVICE } from 'src/core/constants/constants';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly userService: UserService,
-  ) { }
+  private readonly usersService: any;
 
-  async validateUser(
-    email: string,
-    password: string,
-  ): Promise<Omit<User, 'password'>> {
-    const user = await this.userService.findOneByEmail(email);
+  constructor(
+    @Inject(USER_MICROSERVICE) private readonly userMicroservice: ClientGrpc,
+    private readonly jwtService: JwtService,
+  ) {
+    this.usersService = this.userMicroservice.getService('UsersService');
+  }
+
+  async validateUser(email: string, password: string): Promise<User> {
+    const user: User = await firstValueFrom(
+      this.usersService.findOneBy({ email }),
+    );
 
     if (!user) {
       throw new RpcException({
@@ -44,23 +47,18 @@ export class AuthService {
       });
     }
 
-    const { password: userPassword, ...restUser } = user;
-
-    return restUser;
+    return user;
   }
 
-  async login(user: Omit<User, 'password'>): Promise<LoginResponse> {
-    const payload = { ...user };
+  async login(user: User): Promise<LoginResponse> {
+    const { password, ...restUser } = user;
 
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(restUser),
     };
   }
 
-  async register(payload: CreateUserDto): Promise<Omit<User, 'password'>> {
-    const { password, ...registeredUser } =
-      await this.userService.create(payload);
-
-    return registeredUser;
+  async register(payload: CreateUserDto): Promise<CreateUserResponse> {
+    return firstValueFrom(this.usersService.createOne(payload.data));
   }
 }
