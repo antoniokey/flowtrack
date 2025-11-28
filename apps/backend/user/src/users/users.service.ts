@@ -16,7 +16,18 @@ export class UsersService {
   ) { }
 
   async findOneBy(filter: unknown): Promise<IUser> {
-    return this.userRepository.findOneBy(filter);
+    const user = await this.userRepository.findOneBy(filter);
+
+    if (!user) {
+      throw new RpcException(
+        JSON.stringify({
+          statusCode: 404,
+          message: 'User not found',
+        }),
+      );
+    }
+
+    return user;
   }
 
   async createOne(user: IUser): Promise<WithoutPasswordUser> {
@@ -27,10 +38,12 @@ export class UsersService {
     });
 
     if (existingUser) {
-      throw new RpcException({
-        statusCode: 400,
-        message: 'User already exists',
-      });
+      throw new RpcException(
+        JSON.stringify({
+          statusCode: 400,
+          message: 'User already exists',
+        }),
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);

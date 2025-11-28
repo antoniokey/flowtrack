@@ -1,10 +1,10 @@
 import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 
 import { LogEvent } from '@flowtrack/types';
 import { LogEventEnvironment, LogEventLevel } from '@flowtrack/constants';
 
-import { catchError, Observable, of, tap } from 'rxjs';
+import { catchError, Observable, tap } from 'rxjs';
 
 export class AuthInterceptor implements NestInterceptor {
   constructor(private readonly loggerMicroservice: ClientProxy) { }
@@ -37,7 +37,7 @@ export class AuthInterceptor implements NestInterceptor {
           level: LogEventLevel.ERROR,
         });
 
-        return of(error.error);
+        throw new RpcException(error.error);
       }),
     );
   }

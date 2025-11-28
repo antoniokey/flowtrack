@@ -3,16 +3,11 @@ import { ClientRMQ } from '@nestjs/microservices';
 
 import { LogEventContext } from '@flowtrack/types';
 
-import { map, Observable } from 'rxjs';
+import { catchError, Observable } from 'rxjs';
 
 import { AUTH_MICROSERVICE } from 'src/core/constants/microservices';
 
-import {
-  LoginUserBadRequestDto,
-  CreateUserBadRequestDto,
-  LoginUserDto,
-  CreateUserDto,
-} from './dto/auth.dto';
+import { LoginUserDto, CreateUserDto } from './dto/auth.dto';
 import { CreateUserResponse, LoginUserResponse } from './types/auth.types';
 
 @Injectable()
@@ -34,14 +29,8 @@ export class AuthService {
         },
       })
       .pipe(
-        map((response: LoginUserResponse) => {
-          if ((response as LoginUserBadRequestDto).error) {
-            throw new BadRequestException(
-              (response as LoginUserBadRequestDto).error,
-            );
-          }
-
-          return response;
+        catchError((error) => {
+          throw new BadRequestException(error.error);
         }),
       );
   }
@@ -59,14 +48,8 @@ export class AuthService {
         },
       })
       .pipe(
-        map((response: CreateUserResponse) => {
-          if ((response as CreateUserBadRequestDto).error) {
-            throw new BadRequestException(
-              (response as CreateUserBadRequestDto).error,
-            );
-          }
-
-          return response;
+        catchError((error) => {
+          throw new BadRequestException(error.error);
         }),
       );
   }

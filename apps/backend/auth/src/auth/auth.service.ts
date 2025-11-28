@@ -23,31 +23,26 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string): Promise<User> {
-    const user: User = await firstValueFrom(
-      this.usersService.findOneBy({ email }),
-    );
+    try {
+      const user: User = await firstValueFrom(
+        this.usersService.findOneBy({ email }),
+      );
 
-    if (!user) {
-      throw new RpcException({
-        error: {
-          statusCode: 404,
-          message: 'User not found',
-        },
-      });
+      const isPasswordMatch = bcrypt.compareSync(password, user.password);
+
+      if (!isPasswordMatch) {
+        throw new RpcException({
+          error: {
+            statusCode: 400,
+            message: 'Password is incorrect',
+          },
+        });
+      }
+
+      return user;
+    } catch (error) {
+      throw new RpcException(JSON.parse(error.details));
     }
-
-    const isPasswordMatch = bcrypt.compareSync(password, user.password);
-
-    if (!isPasswordMatch) {
-      throw new RpcException({
-        error: {
-          statusCode: 400,
-          message: 'Password is incorrect',
-        },
-      });
-    }
-
-    return user;
   }
 
   async login(user: User): Promise<LoginResponse> {
@@ -59,6 +54,10 @@ export class AuthService {
   }
 
   async register(payload: CreateUserDto): Promise<CreateUserResponse> {
-    return firstValueFrom(this.usersService.createOne(payload.data));
+    try {
+      return await firstValueFrom(this.usersService.createOne(payload.data));
+    } catch (error) {
+      throw new RpcException(JSON.parse(error.details));
+    }
   }
 }
