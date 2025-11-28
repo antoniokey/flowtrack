@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
-import { FinanceController } from './finance/finance.controller';
-import { FinanceService } from './finance/finance.service';
 import {
   AUTH_MICROSERVICE,
   FINANCE_MICROSERVICE,
 } from './core/constants/microservices';
-import { AuthController } from './auth/auth.controller';
-import { AuthService } from './auth/auth.service';
+
+import { FinanceModule } from './finance/finance.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -36,8 +35,8 @@ import { AuthService } from './auth/auth.service';
         },
       },
     ]),
+    FinanceModule,
+    AuthModule,
   ],
-  controllers: [AuthController, FinanceController],
-  providers: [AuthService, FinanceService],
 })
 export class AppModule { }
