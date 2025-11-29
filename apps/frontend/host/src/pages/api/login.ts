@@ -8,12 +8,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(req.body),
+      credentials: 'include',
     });
 
     const data = await response.json();
-  
+
+    const cookies = response.headers.getSetCookie();
+
+    if (cookies) {
+      res.setHeader('set-cookie', cookies);
+    }
+
     return res.status(response.status).json(data);
-  } catch(error) {
+  } catch (error) {
     throw error;
   }
 };

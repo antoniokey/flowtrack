@@ -1,4 +1,9 @@
-import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
+import {
+  BadRequestException,
+  CallHandler,
+  ExecutionContext,
+  NestInterceptor,
+} from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 
 import { LogEvent } from '@flowtrack/types';
@@ -33,11 +38,13 @@ export class AuthInterceptor implements NestInterceptor {
       catchError((error) => {
         this.loggerMicroservice.emit('logEvent', {
           ...logEvent,
-          error: error.error,
+          error: error.error ?? { status: 400, message: error.message },
           level: LogEventLevel.ERROR,
         });
 
-        throw new RpcException(error.error);
+        throw new RpcException(
+          error.error ?? { status: 400, message: error.message },
+        );
       }),
     );
   }

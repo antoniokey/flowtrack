@@ -6,7 +6,13 @@ import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import * as bcrypt from 'bcrypt';
 import { firstValueFrom } from 'rxjs';
 
-import { CreateUserResponse, LoginResponse, User } from '@flowtrack/types';
+import { TokenType } from '@flowtrack/constants';
+import {
+  CreateUserResponse,
+  LoginResponse,
+  User,
+  WithoutPasswordUser,
+} from '@flowtrack/types';
 
 import { CreateUserDto } from 'src/auth/dto/create-user.dto';
 import { USER_MICROSERVICE } from 'src/core/constants/constants';
@@ -49,7 +55,8 @@ export class AuthService {
     const { password, ...restUser } = user;
 
     return {
-      access_token: this.jwtService.sign(restUser),
+      access_token: this.generateToken(TokenType.ACCESS_TOKEN, restUser),
+      refresh_token: this.generateToken(TokenType.REFRESH_TOKEN, restUser),
     };
   }
 
@@ -58,6 +65,23 @@ export class AuthService {
       return await firstValueFrom(this.usersService.createOne(payload.data));
     } catch (error) {
       throw new RpcException(JSON.parse(error.details));
+    }
+  }
+
+  private generateToken(
+    tokenType: TokenType,
+    user: WithoutPasswordUser,
+  ): string {
+    if (tokenType === TokenType.ACCESS_TOKEN) {
+      return this.jwtService.sign(
+        { sub: user.id },
+        { expiresIn: 15 * 60 * 1000 },
+      );
+    } else {
+      return this.jwtService.sign(
+        { sub: user.id },
+        { expiresIn: 7 * 24 * 60 * 60 * 1000 },
+      );
     }
   }
 }

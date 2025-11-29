@@ -2,11 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { jwtDecode } from 'jwt-decode';
 
 import { useMutation } from '@tanstack/react-query';
 
-import { useUserStore } from '@flowtrack/store';
 import Modal from '@flowtrack/ui/components/Modal/Modal';
 import TextInputField from '@flowtrack/ui/components/TextInputField/TextInputField';
 import Button from '@flowtrack/ui/components/Button/Button';
@@ -28,9 +26,7 @@ interface LoginModalFormFields {
 const LoginModal = ({ setIsLoginModalOpened }: LoginModalProps) => {
   const { t } = useTranslation();
 
-  const router = useFlowtrackRouter(); 
-
-  const { setUser } = useUserStore();
+  const router = useFlowtrackRouter();
 
   const mutation = useMutation({
     mutationFn: async (values: LoginModalFormFields) => {
@@ -58,13 +54,11 @@ const LoginModal = ({ setIsLoginModalOpened }: LoginModalProps) => {
 
   const onLoginSubmit = async (values: LoginModalFormFields) => {
     mutation.mutate(values, {
-      onSuccess: (data) => {
-        localStorage.setItem('access_token', data.access_token);
-
-        setUser(jwtDecode(data.access_token));
+      onSuccess: () => {
+        localStorage.setItem('isLoggedIn', 'true');
 
         router.push('/dashboard');
-        
+
         setIsLoginModalOpened(false);
       },
       onError: (error) => toast(error.message, { type: 'error' }),

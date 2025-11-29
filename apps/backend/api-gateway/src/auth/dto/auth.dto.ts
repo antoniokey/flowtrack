@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { CreateUserResponse, LoginResponse, User } from '@flowtrack/types';
+import { CreateUserResponse, User } from '@flowtrack/types';
 
 class ErrorDto {
   @ApiProperty()
@@ -12,15 +12,18 @@ class ErrorDto {
 
 export class LoginUserDto implements Omit<User, 'name'> {
   @ApiProperty()
+  id: number;
+
+  @ApiProperty()
   email: string;
 
   @ApiProperty()
   password: string;
 }
 
-export class LoginUserResponseDto implements LoginResponse {
+export class LoginUserResponseDto {
   @ApiProperty()
-  access_token: string;
+  ok: boolean;
 }
 
 export class LoginUserBadRequestDto {
@@ -29,6 +32,9 @@ export class LoginUserBadRequestDto {
 }
 
 export class CreateUserDto implements User {
+  @ApiProperty()
+  id: number;
+
   @ApiProperty()
   name: string;
 
@@ -40,6 +46,9 @@ export class CreateUserDto implements User {
 }
 
 export class CreateUserResponseDto implements CreateUserResponse {
+  @ApiProperty()
+  id: number;
+
   @ApiProperty()
   name: string;
 

@@ -1,12 +1,14 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, Res } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
 
+import { TokenType } from '@flowtrack/constants';
 import { LogEventContext as ILogEventContext } from '@flowtrack/types';
 
+import { Response } from 'express';
 import { Observable } from 'rxjs';
 
 import { LogEventContext } from 'src/core/decorators/log-event-context.decorator';
@@ -20,7 +22,7 @@ import {
   LoginUserDto,
   CreateUserDto,
 } from './dto/auth.dto';
-import { CreateUserResponse, LoginUserResponse } from './types/auth.types';
+import { CreateUserResponse } from './types/auth.types';
 
 @Controller()
 export class AuthController {
@@ -33,11 +35,28 @@ export class AuthController {
   })
   @HttpCode(200)
   @Post('login')
-  login(
+  async login(
     @LogEventContext() logEventContext: ILogEventContext,
     @Body() user: LoginUserDto,
-  ): Observable<LoginUserResponse> {
-    return this.authService.login(user, logEventContext);
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<LoginUserResponseDto> {
+    const loginUserResponse = await this.authService.login(
+      user,
+      logEventContext,
+    );
+
+    response.cookie(
+      TokenType.ACCESS_TOKEN,
+      loginUserResponse.access_token,
+      this.authService.getCookieData(TokenType.ACCESS_TOKEN),
+    );
+    response.cookie(
+      TokenType.REFRESH_TOKEN,
+      loginUserResponse.refresh_token,
+      this.authService.getCookieData(TokenType.REFRESH_TOKEN),
+    );
+
+    return { ok: true };
   }
 
   @ApiCreatedResponse({

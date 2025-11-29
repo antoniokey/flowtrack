@@ -1,14 +1,16 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ClientRMQ } from '@nestjs/microservices';
 
-import { LogEventContext } from '@flowtrack/types';
+import { TokenType } from '@flowtrack/constants';
+import { LogEventContext, LoginResponse } from '@flowtrack/types';
 
-import { catchError, Observable } from 'rxjs';
+import { CookieOptions } from 'express';
+import { catchError, firstValueFrom, Observable } from 'rxjs';
 
 import { AUTH_MICROSERVICE } from 'src/core/constants/microservices';
 
 import { LoginUserDto, CreateUserDto } from './dto/auth.dto';
-import { CreateUserResponse, LoginUserResponse } from './types/auth.types';
+import { CreateUserResponse } from './types/auth.types';
 
 @Injectable()
 export class AuthService {
@@ -19,20 +21,22 @@ export class AuthService {
   login(
     user: LoginUserDto,
     logEventContext: LogEventContext,
-  ): Observable<LoginUserResponse> {
-    return this.authMicroservice
-      .send('login', {
-        data: { ...user },
-        logEvent: {
-          operation: 'login',
-          context: logEventContext,
-        },
-      })
-      .pipe(
-        catchError((error) => {
-          throw new BadRequestException(error.error);
-        }),
-      );
+  ): Promise<LoginResponse> {
+    return firstValueFrom(
+      this.authMicroservice
+        .send('login', {
+          data: { ...user },
+          logEvent: {
+            operation: 'login',
+            context: logEventContext,
+          },
+        })
+        .pipe(
+          catchError((error) => {
+            throw new BadRequestException(error.error);
+          }),
+        ),
+    );
   }
 
   register(
@@ -52,5 +56,21 @@ export class AuthService {
           throw new BadRequestException(error.error);
         }),
       );
+  }
+
+  getCookieData(tokenType: TokenType): CookieOptions {
+    const cookieOptions: CookieOptions = {
+      secure: true,
+      sameSite: true,
+      httpOnly: true,
+    };
+
+    if (tokenType === TokenType.ACCESS_TOKEN) {
+      cookieOptions.maxAge = 60 * 60 * 24 * 7;
+    } else {
+      cookieOptions.maxAge = 60 * 60 * 24 * 7 * 2;
+    }
+
+    return cookieOptions;
   }
 }

@@ -27,8 +27,7 @@ export default function App({ Component, pageProps }: AppProps) {
       return;
     }
 
-    const token = localStorage.getItem('access_token');
-    const isLoggedIn = !!token;
+    const isLoggedIn = !!localStorage.getItem('isLoggedId');
 
     setIsLoggedIn(!!isLoggedIn);
 
