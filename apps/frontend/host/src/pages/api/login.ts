@@ -10,7 +10,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       body: JSON.stringify(req.body),
       credentials: 'include',
     });
-
+    console.log(response)
     const data = await response.json();
 
     const cookies = response.headers.getSetCookie();
