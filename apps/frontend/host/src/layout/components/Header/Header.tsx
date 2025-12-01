@@ -1,20 +1,17 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'next/navigation';
 
-import { useUserStore } from '@flowtrack/store';
 import Button from '@flowtrack/ui/components/Button/Button';
 
-import { ButtonSize, ButtonType, ButtonVariant } from '../../../../../../../packages/ui/src/components/Button/constants';
+import { useAuth } from '@/hooks/auth';
 
+import { ButtonSize, ButtonType, ButtonVariant } from '../../../../../../../packages/ui/src/components/Button/constants';
 import styles from './Header.module.scss';
 
 const LayoutHeader = () => {
   const { t } = useTranslation();
 
-  const { removeUser } = useUserStore();
-
-  const router = useRouter();
+  const { setIsLogoutConfirmationModalOpened } = useAuth();
 
   return (
     <div className={styles.layoutHeader}>
@@ -23,15 +20,9 @@ const LayoutHeader = () => {
         size={ButtonSize.Medium}
         type={ButtonType.Submit}
         className={styles.logoutButton}
-        onClick={() => {
-          localStorage.removeItem('access_token');
-
-          removeUser();
-
-          router.push('/');
-        }}
+        onClick={() => setIsLogoutConfirmationModalOpened(true)}
       >
-        {t('header.logout_button')}
+        {t('buttons.logout')}
       </Button>
     </div>
   );

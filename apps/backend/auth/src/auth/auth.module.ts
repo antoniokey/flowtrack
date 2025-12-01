@@ -3,6 +3,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 import * as path from 'path';
 
@@ -10,6 +11,7 @@ import { USER_MICROSERVICE } from 'src/core/constants/constants';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { Session } from './entities/session';
 
 @Module({
   imports: [
@@ -30,6 +32,7 @@ import { AuthService } from './auth.service';
         signOptions: { expiresIn: '60s' },
       }),
     }),
+    TypeOrmModule.forFeature([Session]),
     PassportModule,
   ],
   controllers: [AuthController],

@@ -7,6 +7,7 @@ declare module 'express' {
   }
   interface Response {
     cookie(name: string, value: string, options?: CookieOptions): Response;
+    clearCookie(name: string): Response;
   }
   interface CookieOptions {
     httpOnly?: boolean;

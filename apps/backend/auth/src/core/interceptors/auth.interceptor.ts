@@ -23,7 +23,7 @@ export class AuthInterceptor implements NestInterceptor {
       environment: process.env.NODE_ENV as LogEventEnvironment,
       service: 'auth-service',
       operation: payload.logEvent.operation || 'unknown',
-      userId: payload.logEvent.userId || null,
+      userId: payload.data.userId || null,
       data: payload.data,
       context: payload.logEvent.context,
     };

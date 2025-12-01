@@ -4,11 +4,11 @@ import { WithoutPasswordUser } from '@flowtrack/types';
 
 import { Request } from 'express';
 
-import { AccessTokenGuard } from 'src/core/guards/access-tonken.guard';
+import { SessionUserGuard } from 'src/core/guards/session-user.guard';
 
 import { UserService } from './user.service';
 
-@UseGuards(AccessTokenGuard)
+@UseGuards(SessionUserGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) { }

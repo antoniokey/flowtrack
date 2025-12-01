@@ -7,6 +7,7 @@ import { CreateUserDto } from 'src/auth/dto/create-user.dto';
 
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
+import { LogoutUserDto } from './dto/logout-user.dto';
 
 @Controller()
 export class AuthController {
@@ -19,7 +20,7 @@ export class AuthController {
       payload.data.password,
     );
 
-    return this.authService.login(user);
+    return this.authService.login(user, payload.logEvent.context.ip);
   }
 
   @MessagePattern('register')
@@ -27,5 +28,10 @@ export class AuthController {
     @Payload() payload: CreateUserDto,
   ): Promise<CreateUserResponse> {
     return this.authService.register(payload);
+  }
+
+  @MessagePattern('logout')
+  async logout(@Payload() payload: LogoutUserDto): Promise<number> {
+    return this.authService.logout(payload.data.userId);
   }
 }

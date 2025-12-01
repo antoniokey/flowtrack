@@ -1,13 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  const cookieHeader = req.headers.cookie || '';
+
   try {
-    const response = await fetch(`${process.env.API_URL}/login`, {
+    const response = await fetch(`${process.env.API_URL}/logout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        cookie: cookieHeader,
       },
-      body: JSON.stringify(req.body),
     });
 
     const data = await response.json();

@@ -58,6 +58,24 @@ export class AuthService {
       );
   }
 
+  logout(userId: number, logEventContext: LogEventContext): Promise<void> {
+    return firstValueFrom(
+      this.authMicroservice
+        .send('logout', {
+          data: { userId },
+          logEvent: {
+            operation: 'logout',
+            context: logEventContext,
+          },
+        })
+        .pipe(
+          catchError((error) => {
+            throw new BadRequestException(error.error);
+          }),
+        ),
+    );
+  }
+
   getCookieData(tokenType: TokenType): CookieOptions {
     const cookieOptions: CookieOptions = {
       secure: true,

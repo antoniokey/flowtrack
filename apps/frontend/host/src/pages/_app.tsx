@@ -4,11 +4,15 @@ import { I18nextProvider } from 'react-i18next';
 import type { AppProps } from 'next/app';
 import { usePathname, useRouter } from 'next/navigation';
 
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { toast, ToastContainer } from 'react-toastify';
+
+import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query';
+
 import { useUserStore } from '@flowtrack/store';
 
 import { AuthContext } from '@/context/auth.context';
 import MainLayout from '@/layout/Layout';
+import LogoutConfirmationModal from '@/layout/components/LogoutConfirmationModal/LogoutConfirmationModal';
 
 import i18n from '../i18n';
 
@@ -19,8 +23,9 @@ const queryClient = new QueryClient();
 function AppInner({ Component, pageProps }: AppProps) {
   const [isClient, setIsClient] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLogoutConfirmationModalOpened, setIsLogoutConfirmationModalOpened] = useState(false);
 
-  const { setUser, user } = useUserStore();
+  const { setUser, removeUser, user } = useUserStore();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -29,6 +34,10 @@ function AppInner({ Component, pageProps }: AppProps) {
     queryKey: ['me'],
     queryFn: () => fetch('/api/user').then((res) => res.json()),
     enabled: isClient && isLoggedIn && !user,
+  });
+
+  const logutMutation = useMutation({
+    mutationFn: () => fetch('/api/logout'),
   });
 
   useEffect(() => {
@@ -49,7 +58,7 @@ function AppInner({ Component, pageProps }: AppProps) {
     } else if (!isLoggedIn) {
       router.replace('/');
     }
-  }, [pathname, isClient]);
+  }, [pathname, isClient, isLoggedIn]);
 
   useEffect(() => {
     if (meData) {
@@ -57,25 +66,65 @@ function AppInner({ Component, pageProps }: AppProps) {
     }
   }, [meData]);
 
+  useEffect(() => {
+    const modalRoot = document.createElement('div');
+
+    modalRoot.id = 'modal';
+
+    document.body.appendChild(modalRoot);
+
+    return () => {
+      document.body.removeChild(modalRoot);
+    };
+  }, []);
+
+  const logout = () => {
+    logutMutation.mutate(undefined, {
+      onSuccess: () => {
+        setIsLogoutConfirmationModalOpened(false);
+        setIsLoggedIn(false);
+
+        removeUser();
+
+        localStorage.removeItem('isLoggedIn');
+      },
+      onError: (error) => toast(error.message, { type: 'error' }),
+    })
+  };
+
   if (!isClient) {
     return null;
   };
 
   return (
-    <I18nextProvider i18n={i18n}>
-      <AuthContext.Provider value={{ isLoggedIn }}>
-        <MainLayout>
-          <Component {...pageProps} />
-        </MainLayout>
-      </AuthContext.Provider>
-    </I18nextProvider>
+    <AuthContext.Provider value={{ isLoggedIn, logout, setIsLogoutConfirmationModalOpened }}>
+      <MainLayout>
+        <Component {...pageProps} />
+
+        {isLogoutConfirmationModalOpened && (
+          <LogoutConfirmationModal
+            onClose={() => setIsLogoutConfirmationModalOpened(false)}
+          />
+        )}
+
+        <ToastContainer
+          position="bottom-center"
+          autoClose={3000}
+          hideProgressBar
+          closeOnClick
+          pauseOnHover
+        />
+      </MainLayout>
+    </AuthContext.Provider>
   );
 }
 
 export default function App({ ...props }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppInner {...props} />
+      <I18nextProvider i18n={i18n}>
+        <AppInner {...props} />
+      </I18nextProvider>
     </QueryClientProvider>
   );
 }

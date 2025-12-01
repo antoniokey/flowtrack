@@ -4,26 +4,38 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 
 import { Observable } from 'rxjs';
 
+import { IS_PUBLIC_KEY } from '../constants/api.constants';
+
 const tokenPrefix = 'access_token=';
 
 @Injectable()
-export class AccessTokenGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) { }
+export class SessionUserGuard implements CanActivate {
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly jwtService: JwtService,
+  ) { }
 
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
+    const isPublic = this.reflector.get(IS_PUBLIC_KEY, context.getHandler());
+
+    if (isPublic) {
+      return true;
+    }
+
     const request = context.switchToHttp().getRequest();
     const cookieHeader = request.headers.cookie;
 
     const accessToken = cookieHeader
-      .split(';')
-      .map((c) => c.trim())
-      .find((c) => c.startsWith(tokenPrefix))
+      ?.split(';')
+      ?.map((c) => c.trim())
+      ?.find((c) => c.startsWith(tokenPrefix))
       ?.split('=')[1];
 
     if (!accessToken) {
@@ -31,7 +43,9 @@ export class AccessTokenGuard implements CanActivate {
     }
 
     try {
-      request.user = this.jwtService.verify(accessToken);
+      const tokenData = this.jwtService.verify(accessToken);
+
+      request.user = { id: +tokenData.sub };
 
       return true;
     } catch (error) {

@@ -2,7 +2,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ClientGrpc, RpcException } from '@nestjs/microservices';
+import { InjectRepository } from '@nestjs/typeorm';
 
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { firstValueFrom } from 'rxjs';
 
@@ -16,6 +18,7 @@ import {
 
 import { CreateUserDto } from 'src/auth/dto/create-user.dto';
 import { USER_MICROSERVICE } from 'src/core/constants/constants';
+import { Session } from './entities/session';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +26,8 @@ export class AuthService {
 
   constructor(
     @Inject(USER_MICROSERVICE) private readonly userMicroservice: ClientGrpc,
+    @InjectRepository(Session)
+    private readonly sessionRepository: Repository<Session>,
     private readonly jwtService: JwtService,
   ) {
     this.usersService = this.userMicroservice.getService('UsersService');
@@ -51,21 +56,53 @@ export class AuthService {
     }
   }
 
-  async login(user: User): Promise<LoginResponse> {
+  async login(user: User, ip: string): Promise<LoginResponse> {
     const { password, ...restUser } = user;
 
+    const access_token = this.generateToken(TokenType.ACCESS_TOKEN, restUser);
+    const refresh_token = this.generateToken(TokenType.REFRESH_TOKEN, restUser);
+
+    await this.createSession(user.id, refresh_token, ip);
+
     return {
-      access_token: this.generateToken(TokenType.ACCESS_TOKEN, restUser),
-      refresh_token: this.generateToken(TokenType.REFRESH_TOKEN, restUser),
+      access_token,
+      refresh_token,
     };
   }
 
   async register(payload: CreateUserDto): Promise<CreateUserResponse> {
     try {
-      return await firstValueFrom(this.usersService.createOne(payload.data));
+      return this.usersService.createOne(payload.data);
     } catch (error) {
       throw new RpcException(JSON.parse(error.details));
     }
+  }
+
+  async logout(userId: number): Promise<number> {
+    try {
+      await this.sessionRepository.delete({ userId });
+
+      return userId;
+    } catch (error) {
+      throw new RpcException(JSON.parse(error.details));
+    }
+  }
+
+  private async createSession(
+    userId: number,
+    refresh_token: string,
+    ip: string,
+  ): Promise<void> {
+    const hash = await bcrypt.hash(refresh_token, 10);
+
+    const session = this.sessionRepository.create({
+      userId,
+      ip,
+      refreshToken: hash,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
+    await this.sessionRepository.save(session);
   }
 
   private generateToken(

@@ -60,3 +60,8 @@ export class CreateUserBadRequestDto {
   @ApiProperty()
   error: ErrorDto;
 }
+
+export class LogoutUserDtoResponse {
+  @ApiProperty()
+  ok: boolean;
+}

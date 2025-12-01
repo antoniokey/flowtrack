@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import * as path from 'path';
 
 import { USER_MICROSERVICE } from 'src/core/constants/microservices';
-import { AccessTokenGuard } from 'src/core/guards/access-tonken.guard';
+import { SessionUserGuard } from 'src/core/guards/session-user.guard';
 
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
@@ -31,6 +31,6 @@ import { UserService } from './user.service';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, AccessTokenGuard],
+  providers: [UserService, SessionUserGuard],
 })
 export class UserModule { }

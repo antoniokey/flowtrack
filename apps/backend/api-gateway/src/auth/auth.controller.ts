@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -8,10 +16,12 @@ import {
 import { TokenType } from '@flowtrack/constants';
 import { LogEventContext as ILogEventContext } from '@flowtrack/types';
 
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { Observable } from 'rxjs';
 
 import { LogEventContext } from 'src/core/decorators/log-event-context.decorator';
+import { SessionUserGuard } from 'src/core/guards/session-user.guard';
+import { Public } from 'src/core/decorators/public.decorator';
 
 import { AuthService } from './auth.service';
 import {
@@ -21,9 +31,11 @@ import {
   CreateUserResponseDto,
   LoginUserDto,
   CreateUserDto,
+  LogoutUserDtoResponse,
 } from './dto/auth.dto';
 import { CreateUserResponse } from './types/auth.types';
 
+@UseGuards(SessionUserGuard)
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
@@ -34,6 +46,7 @@ export class AuthController {
     type: LoginUserBadRequestDto,
   })
   @HttpCode(200)
+  @Public()
   @Post('login')
   async login(
     @LogEventContext() logEventContext: ILogEventContext,
@@ -67,11 +80,27 @@ export class AuthController {
     description: 'Register failed',
     type: CreateUserBadRequestDto,
   })
+  @Public()
   @Post('register')
   register(
     @LogEventContext() logEventContext: ILogEventContext,
     @Body() user: CreateUserDto,
   ): Observable<CreateUserResponse> {
     return this.authService.register(user, logEventContext);
+  }
+
+  @HttpCode(200)
+  @Post('logout')
+  async logout(
+    @LogEventContext() logEventContext: ILogEventContext,
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<LogoutUserDtoResponse> {
+    await this.authService.logout(request.user.id, logEventContext);
+
+    response.clearCookie(TokenType.ACCESS_TOKEN);
+    response.clearCookie(TokenType.REFRESH_TOKEN);
+
+    return { ok: true };
   }
 }

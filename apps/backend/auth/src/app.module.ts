@@ -7,6 +7,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { LOGGER_MICROSERVICE } from './core/constants/constants';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { Session } from './auth/entities/session';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { AuthInterceptor } from './core/interceptors/auth.interceptor';
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_DB'),
-        entities: [],
+        entities: [Session],
         synchronize: true,
       }),
     }),

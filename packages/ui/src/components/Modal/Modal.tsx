@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import clsx from 'clsx';
 
 import styles from './Modal.module.scss';
 import { ModalContext } from './context';
@@ -8,6 +9,7 @@ import { useModal } from './hooks';
 interface ModalProps {
   children: React.ReactNode;
   onClose: () => void;
+  classNames?: Record<string, unknown>;
 }
 
 const Modal = ({ children, onClose }: ModalProps) => {
@@ -40,8 +42,8 @@ const ModalHeader = ({ children }: Omit<ModalProps, 'onClose'>) => {
   );
 };
 
-const ModalBody = ({ children }: Omit<ModalProps, 'onClose'>) => (
-  <div className={styles.modalBody}>
+const ModalBody = ({ children, classNames }: Omit<ModalProps, 'onClose'>) => (
+  <div className={clsx(styles.modalBody, classNames?.modalBody ?? '')}>
     {children}
   </div>
 );
