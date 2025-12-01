@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import type { AppProps } from 'next/app';
-import { usePathname, useRouter } from 'next/navigation';
 
 import { toast, ToastContainer } from 'react-toastify';
 
@@ -13,6 +12,7 @@ import { useUserStore } from '@flowtrack/store';
 import { AuthContext } from '@/context/auth.context';
 import MainLayout from '@/layout/Layout';
 import LogoutConfirmationModal from '@/layout/components/LogoutConfirmationModal/LogoutConfirmationModal';
+import { useInitizlize } from '@/hooks/initialize';
 
 import i18n from '../i18n';
 
@@ -21,14 +21,11 @@ import '../styles/globals.scss';
 const queryClient = new QueryClient();
 
 function AppInner({ Component, pageProps }: AppProps) {
-  const [isClient, setIsClient] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isClient, isLoggedIn, setIsLoggedIn } = useInitizlize();
+
   const [isLogoutConfirmationModalOpened, setIsLogoutConfirmationModalOpened] = useState(false);
 
   const { setUser, removeUser, user } = useUserStore();
-
-  const router = useRouter();
-  const pathname = usePathname();
 
   const { data: meData } = useQuery({
     queryKey: ['me'],
@@ -41,42 +38,14 @@ function AppInner({ Component, pageProps }: AppProps) {
   });
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isClient) {
-      return;
-    }
-
-    const isLoggedIn = !!localStorage.getItem('isLoggedIn');
-
-    setIsLoggedIn(!!isLoggedIn);
-
-    if (isLoggedIn) {
-      router.replace('/dashboard');
-    } else if (!isLoggedIn) {
-      router.replace('/');
-    }
-  }, [pathname, isClient, isLoggedIn]);
-
-  useEffect(() => {
     if (meData) {
       setUser(meData);
     }
   }, [meData]);
 
-  useEffect(() => {
-    const modalRoot = document.createElement('div');
-
-    modalRoot.id = 'modal';
-
-    document.body.appendChild(modalRoot);
-
-    return () => {
-      document.body.removeChild(modalRoot);
-    };
-  }, []);
+  if (!isClient) {
+    return null;
+  };
 
   const logout = () => {
     logutMutation.mutate(undefined, {
@@ -90,10 +59,6 @@ function AppInner({ Component, pageProps }: AppProps) {
       },
       onError: (error) => toast(error.message, { type: 'error' }),
     })
-  };
-
-  if (!isClient) {
-    return null;
   };
 
   return (
