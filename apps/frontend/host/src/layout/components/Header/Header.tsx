@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Button from '@flowtrack/ui/components/Button/Button';
 
-import { useAuth } from '@/hooks/auth';
+import { AuthContext, IAuthContext } from '@/context/auth.context';
 
 import { ButtonSize, ButtonType, ButtonVariant } from '../../../../../../../packages/ui/src/components/Button/constants';
 import styles from './Header.module.scss';
@@ -11,7 +11,7 @@ import styles from './Header.module.scss';
 const LayoutHeader = () => {
   const { t } = useTranslation();
 
-  const { setIsLogoutConfirmationModalOpened } = useAuth();
+  const { setIsLogoutConfirmationModalOpened } = useContext(AuthContext) as IAuthContext;
 
   return (
     <div className={styles.layoutHeader}>

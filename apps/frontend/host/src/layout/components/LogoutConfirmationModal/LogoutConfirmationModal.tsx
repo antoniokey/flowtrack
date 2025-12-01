@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Modal from '@flowtrack/ui/components/Modal/Modal';
 import Button from '@flowtrack/ui/components/Button/Button';
 
-import { useAuth } from '@/hooks/auth';
+import { AuthContext, IAuthContext } from '@/context/auth.context';
 
 import { ButtonSize, ButtonType, ButtonVariant } from '../../../../../../../packages/ui/src/components/Button/constants';
 import styles from './LogoutConfirmationModal.module.scss';
@@ -16,7 +16,7 @@ interface LogoutConfirmationModalProps {
 const LogoutConfirmationModal = ({ onClose }: LogoutConfirmationModalProps) => {
   const { t } = useTranslation();
 
-  const { logout } = useAuth();
+  const { logout } = useContext(AuthContext) as IAuthContext;
 
   return (
     <Modal onClose={onClose}>

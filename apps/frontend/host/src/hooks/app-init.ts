@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
-export const useInitizlize = () => {
+export function useAppInit() {
   const [isClient, setIsClient] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -20,26 +20,14 @@ export const useInitizlize = () => {
 
     const isLoggedIn = !!localStorage.getItem('isLoggedIn');
 
-    setIsLoggedIn(!!isLoggedIn);
+    setIsLoggedIn(isLoggedIn);
 
     if (isLoggedIn) {
       router.replace('/dashboard');
-    } else if (!isLoggedIn) {
+    } else {
       router.replace('/');
     }
-  }, [pathname, isClient, isLoggedIn]);
-
-  useEffect(() => {
-    const modalRoot = document.createElement('div');
-
-    modalRoot.id = 'modal';
-
-    document.body.appendChild(modalRoot);
-
-    return () => {
-      document.body.removeChild(modalRoot);
-    };
-  }, []);
+  }, [pathname, isClient]);
 
   return { isClient, isLoggedIn, setIsLoggedIn };
-};
+}

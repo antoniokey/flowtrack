@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
-import { useAuth } from '@/hooks/auth';
+import { AuthContext, IAuthContext } from '@/context/auth.context';
 
 import styles from './Layout.module.scss';
 import LayoutHeader from './components/Header/Header';
@@ -11,7 +11,7 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useContext(AuthContext) as IAuthContext;
 
   return (
     <>
