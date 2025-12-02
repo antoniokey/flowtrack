@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { AUTH_MICROSERVICE } from 'src/core/constants/microservices';
 import { SessionUserGuard } from 'src/core/guards/session-user.guard';
+import { RefreshTokenGuard } from 'src/core/guards/refresh-token.guard';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -27,11 +28,11 @@ import { AuthService } from './auth.service';
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('jwtSecret'),
+        secret: configService.get('JWT_SECRET'),
       }),
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, SessionUserGuard],
+  providers: [AuthService, SessionUserGuard, RefreshTokenGuard],
 })
 export class AuthModule { }

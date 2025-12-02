@@ -5,10 +5,16 @@ import * as cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
 
+const whitelist = [process.env.FRONTEND_URL];
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(cookieParser());
+  app.enableCors({
+    credentials: true,
+    origin: whitelist,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Flowtrack API')

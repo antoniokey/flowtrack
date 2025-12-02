@@ -3,11 +3,14 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 
 import { CreateUserResponse, LoginResponse } from '@flowtrack/types';
 
+import { DeleteResult } from 'typeorm';
+
 import { CreateUserDto } from 'src/auth/dto/create-user.dto';
 
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LogoutUserDto } from './dto/logout-user.dto';
+import { RefreshTokenDto } from './dto/refresh-token';
 
 @Controller()
 export class AuthController {
@@ -31,7 +34,14 @@ export class AuthController {
   }
 
   @MessagePattern('logout')
-  async logout(@Payload() payload: LogoutUserDto): Promise<number> {
+  async logout(@Payload() payload: LogoutUserDto): Promise<DeleteResult> {
     return this.authService.logout(payload.data.userId);
+  }
+
+  @MessagePattern('refresh_token')
+  async refreshToken(
+    @Payload() payload: RefreshTokenDto,
+  ): Promise<LoginResponse> {
+    return this.authService.refreshToken(payload.data.refresh_token);
   }
 }

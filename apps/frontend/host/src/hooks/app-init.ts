@@ -27,7 +27,7 @@ export function useAppInit() {
     } else {
       router.replace('/');
     }
-  }, [pathname, isClient]);
+  }, [pathname, isClient, isLoggedIn]);
 
   return { isClient, isLoggedIn, setIsLoggedIn };
 }

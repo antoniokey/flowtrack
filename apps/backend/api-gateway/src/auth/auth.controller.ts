@@ -22,6 +22,7 @@ import { Observable } from 'rxjs';
 import { LogEventContext } from 'src/core/decorators/log-event-context.decorator';
 import { SessionUserGuard } from 'src/core/guards/session-user.guard';
 import { Public } from 'src/core/decorators/public.decorator';
+import { RefreshTokenGuard } from 'src/core/guards/refresh-token.guard';
 
 import { AuthService } from './auth.service';
 import {
@@ -32,10 +33,12 @@ import {
   LoginUserDto,
   CreateUserDto,
   LogoutUserDtoResponse,
+  LogoutUserBadRequestDto,
+  RefreshTokenDtoResponse,
+  RefreshTokenBadRequestDto,
 } from './dto/auth.dto';
 import { CreateUserResponse } from './types/auth.types';
 
-@UseGuards(SessionUserGuard)
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
@@ -69,7 +72,7 @@ export class AuthController {
       this.authService.getCookieData(TokenType.REFRESH_TOKEN),
     );
 
-    return { ok: true };
+    return response.json({ ok: true });
   }
 
   @ApiCreatedResponse({
@@ -89,8 +92,17 @@ export class AuthController {
     return this.authService.register(user, logEventContext);
   }
 
+  @ApiCreatedResponse({
+    description: 'Logout success',
+    type: LogoutUserDtoResponse,
+  })
+  @ApiBadRequestResponse({
+    description: 'Logout failed',
+    type: LogoutUserBadRequestDto,
+  })
   @HttpCode(200)
   @Post('logout')
+  @UseGuards(SessionUserGuard)
   async logout(
     @LogEventContext() logEventContext: ILogEventContext,
     @Req() request: Request,
@@ -101,6 +113,41 @@ export class AuthController {
     response.clearCookie(TokenType.ACCESS_TOKEN);
     response.clearCookie(TokenType.REFRESH_TOKEN);
 
-    return { ok: true };
+    return response.json({ ok: true });
+  }
+
+  @ApiCreatedResponse({
+    description: 'Refresh token success',
+    type: RefreshTokenDtoResponse,
+  })
+  @ApiBadRequestResponse({
+    description: 'Refresh token failed',
+    type: RefreshTokenBadRequestDto,
+  })
+  @HttpCode(200)
+  @Post('refresh')
+  @UseGuards(RefreshTokenGuard)
+  async refresh(
+    @LogEventContext() logEventContext: ILogEventContext,
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<RefreshTokenDtoResponse> {
+    const refreshTokenResponse = await this.authService.refreshToken(
+      request.refreshToken,
+      logEventContext,
+    );
+
+    response.cookie(
+      TokenType.ACCESS_TOKEN,
+      refreshTokenResponse.access_token,
+      this.authService.getCookieData(TokenType.ACCESS_TOKEN),
+    );
+    response.cookie(
+      TokenType.REFRESH_TOKEN,
+      refreshTokenResponse.refresh_token,
+      this.authService.getCookieData(TokenType.REFRESH_TOKEN),
+    );
+
+    return response.json({ ok: true });
   }
 }

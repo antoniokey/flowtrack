@@ -65,3 +65,18 @@ export class LogoutUserDtoResponse {
   @ApiProperty()
   ok: boolean;
 }
+
+export class LogoutUserBadRequestDto {
+  @ApiProperty()
+  error: ErrorDto;
+}
+
+export class RefreshTokenDtoResponse {
+  @ApiProperty()
+  ok: boolean;
+}
+
+export class RefreshTokenBadRequestDto {
+  @ApiProperty()
+  error: ErrorDto;
+}

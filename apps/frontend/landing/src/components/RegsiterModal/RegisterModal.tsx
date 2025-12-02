@@ -8,6 +8,7 @@ import { useMutation } from '@tanstack/react-query';
 import Modal from '@flowtrack/ui/components/Modal/Modal';
 import TextInputField from '@flowtrack/ui/components/TextInputField/TextInputField';
 import Button from '@flowtrack/ui/components/Button/Button';
+import { useApiClient } from '@flowtrack/api';
 
 import styles from './RegisterModal.module.scss';
 import { ButtonSize, ButtonType, ButtonVariant } from '../../../../../../packages/ui/src/components/Button/constants';
@@ -26,25 +27,19 @@ interface RegisterModalFormFields {
 }
 
 const RegisterModal = ({ setIsRegisterModalOpened, setIsLoginModalOpened }: RegisterModalProps) => {
+  const apiClient = useApiClient(process.env.NEXT_PUBLIC_API_URL ?? '');
+
   const { t } = useTranslation();
 
   const registerMutation = useMutation({
     mutationFn: async (values: Omit<RegisterModalFormFields, 'confirmPassword'>) => {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-
-      const data = await response.json();
+      const response = await apiClient.post('/register', values);
 
       if (!response.ok) {
-        throw new Error(data.message);
+        throw new Error(response.statusText);
       }
 
-      return data;
+      return response;
     },
   });
 

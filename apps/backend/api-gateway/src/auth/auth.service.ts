@@ -76,10 +76,34 @@ export class AuthService {
     );
   }
 
+  refreshToken(
+    refresh_token: string,
+    logEventContext: LogEventContext,
+  ): Promise<LoginResponse> {
+    return firstValueFrom(
+      this.authMicroservice
+        .send('refresh_token', {
+          data: { refresh_token },
+          logEvent: {
+            operation: 'refreshToken',
+            context: logEventContext,
+          },
+        })
+        .pipe(
+          catchError((error) => {
+            throw new BadRequestException(error.error);
+          }),
+        ),
+    );
+  }
+
   getCookieData(tokenType: TokenType): CookieOptions {
+    const isProduction = process.env.NODE_ENV === 'production';
+
     const cookieOptions: CookieOptions = {
-      secure: true,
-      sameSite: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      path: '/',
       httpOnly: true,
     };
 

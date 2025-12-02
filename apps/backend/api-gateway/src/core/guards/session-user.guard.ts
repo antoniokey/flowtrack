@@ -9,9 +9,10 @@ import { JwtService } from '@nestjs/jwt';
 
 import { Observable } from 'rxjs';
 
-import { IS_PUBLIC_KEY } from '../constants/api.constants';
+import { TokenType } from '@flowtrack/constants';
 
-const tokenPrefix = 'access_token=';
+import { IS_PUBLIC_KEY } from '../constants/api.constants';
+import { parseCookieFromHeader } from '../utils/parseCookieFromHeader';
 
 @Injectable()
 export class SessionUserGuard implements CanActivate {
@@ -30,16 +31,14 @@ export class SessionUserGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const cookieHeader = request.headers.cookie;
 
-    const accessToken = cookieHeader
-      ?.split(';')
-      ?.map((c) => c.trim())
-      ?.find((c) => c.startsWith(tokenPrefix))
-      ?.split('=')[1];
+    const accessToken =
+      request.cookies[TokenType.ACCESS_TOKEN] ||
+      (request.headers.cookie &&
+        parseCookieFromHeader(request.headers.cookie, TokenType.ACCESS_TOKEN));
 
     if (!accessToken) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid token');
     }
 
     try {
