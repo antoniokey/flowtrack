@@ -1,16 +1,18 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ClientRMQ } from '@nestjs/microservices';
 
-import { TokenType } from '@flowtrack/constants';
-import { LogEventContext, LoginResponse } from '@flowtrack/types';
+import { TokenType, AUTH_MICROSERVICE } from '@flowtrack/constants';
+import {
+  CreateUserResponse,
+  LogEventContext,
+  LoginResponse,
+} from '@flowtrack/types';
 
 import { CookieOptions } from 'express';
-import { catchError, firstValueFrom, Observable } from 'rxjs';
+import { catchError, firstValueFrom } from 'rxjs';
 
-import { AUTH_MICROSERVICE } from 'src/core/constants/microservices';
-
-import { LoginUserDto, CreateUserDto } from './dto/auth.dto';
-import { CreateUserResponse } from './types/auth.types';
+import { LoginRequestDto } from './dto/login.dto';
+import { CreateRequestUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +21,7 @@ export class AuthService {
   ) { }
 
   login(
-    user: LoginUserDto,
+    user: LoginRequestDto,
     logEventContext: LogEventContext,
   ): Promise<LoginResponse> {
     return firstValueFrom(
@@ -40,22 +42,24 @@ export class AuthService {
   }
 
   register(
-    user: CreateUserDto,
+    user: CreateRequestUserDto,
     logEventContext: LogEventContext,
-  ): Observable<CreateUserResponse> {
-    return this.authMicroservice
-      .send('register', {
-        data: { ...user },
-        logEvent: {
-          operation: 'regiter',
-          context: logEventContext,
-        },
-      })
-      .pipe(
-        catchError((error) => {
-          throw new BadRequestException(error.error);
-        }),
-      );
+  ): Promise<CreateUserResponse> {
+    return firstValueFrom(
+      this.authMicroservice
+        .send('register', {
+          data: { ...user },
+          logEvent: {
+            operation: 'regiter',
+            context: logEventContext,
+          },
+        })
+        .pipe(
+          catchError((error) => {
+            throw new BadRequestException(error.error);
+          }),
+        ),
+    );
   }
 
   logout(userId: number, logEventContext: LogEventContext): Promise<void> {

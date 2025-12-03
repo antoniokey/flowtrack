@@ -3,7 +3,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
-import { AUTH_MICROSERVICE } from 'src/core/constants/microservices';
+import { AUTH_MICROSERVICE } from '@flowtrack/constants';
+
 import { SessionUserGuard } from 'src/core/guards/session-user.guard';
 import { RefreshTokenGuard } from 'src/core/guards/refresh-token.guard';
 

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
-import { FINANCE_MICROSERVICE } from 'src/core/constants/microservices';
+import { FINANCE_MICROSERVICE } from '@flowtrack/constants';
 
 import { FinanceService } from './finance.service';
 import { FinanceController } from './finance.controller';

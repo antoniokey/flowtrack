@@ -1,8 +1,8 @@
 {
   "extends": "@flowtrack/typescript-config/base.json",
   "compilerOptions": {
-    "outDir": "dist"
+    "outDir": "dist",
+    "experimentalDecorators": true,
   },
-  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }

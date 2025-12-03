@@ -5,9 +5,9 @@ import { ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import * as path from 'path';
+import { USER_MICROSERVICE } from '@flowtrack/constants';
 
-import { USER_MICROSERVICE } from 'src/core/constants/constants';
+import * as path from 'path';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';

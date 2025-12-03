@@ -3,9 +3,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
+import { USER_MICROSERVICE } from '@flowtrack/constants';
+
 import * as path from 'path';
 
-import { USER_MICROSERVICE } from 'src/core/constants/microservices';
 import { SessionUserGuard } from 'src/core/guards/session-user.guard';
 
 import { UserController } from './user.controller';

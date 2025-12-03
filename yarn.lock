@@ -1291,7 +1291,7 @@
     "@emnapi/runtime" "^1.5.0"
     "@tybys/wasm-util" "^0.10.1"
 
-"@nestjs/cli@^10.0.0":
+"@nestjs/cli@^10", "@nestjs/cli@^10.0.0":
   version "10.4.9"
   resolved "https://registry.npmjs.org/@nestjs/cli/-/cli-10.4.9.tgz"
   integrity sha512-s8qYd97bggqeK7Op3iD49X2MpFtW4LVNLAwXFkfbRxKME6IYT7X0muNTJ2+QfI8hpbNx9isWkrLWIp+g5FOhiA==
@@ -1376,22 +1376,6 @@
     iterare "1.2.1"
     tslib "2.8.1"
 
-"@nestjs/microservices@^11.1.7":
-  version "11.1.7"
-  resolved "https://registry.npmjs.org/@nestjs/microservices/-/microservices-11.1.7.tgz"
-  integrity sha512-Oc+Uqsx5Br0aCZOaQ4n+ykiI3q1nUNZ2zwM6WRxVYG5BWfeicXS0b68abg9LRblLmRJ5pX7NynE86YKNuN20nQ==
-  dependencies:
-    iterare "1.2.1"
-    tslib "2.8.1"
-
-"@nestjs/microservices@^11.1.9":
-  version "11.1.9"
-  resolved "https://registry.yarnpkg.com/@nestjs/microservices/-/microservices-11.1.9.tgz#25c839721b8c840411a0e924427c476ac2e92872"
-  integrity sha512-2n9ftdRej+vv+MMO863dDvxBaJ/VHkzroo/Nyl59mE23mCYno3NZEn0QgCYByktoE8r7Cc0kSOqrTVE++KALug==
-  dependencies:
-    iterare "1.2.1"
-    tslib "2.8.1"
-
 "@nestjs/mongoose@^11.0.3":
   version "11.0.3"
   resolved "https://registry.yarnpkg.com/@nestjs/mongoose/-/mongoose-11.0.3.tgz#8278f0c5b76a7a0b7ac780f0c85341e5ce69eb9c"
@@ -1413,7 +1397,7 @@
     multer "2.0.2"
     tslib "2.8.1"
 
-"@nestjs/schematics@^10.0.0", "@nestjs/schematics@^10.0.1":
+"@nestjs/schematics@^10", "@nestjs/schematics@^10.0.0", "@nestjs/schematics@^10.0.1":
   version "10.2.3"
   resolved "https://registry.npmjs.org/@nestjs/schematics/-/schematics-10.2.3.tgz"
   integrity sha512-4e8gxaCk7DhBxVUly2PjYL4xC2ifDFexCqq1/u4TtivLGXotVk0wHdYuPYe1tHTHuR1lsOkRbfOCpkdTnigLVg==
@@ -1436,7 +1420,7 @@
     path-to-regexp "8.3.0"
     swagger-ui-dist "5.30.2"
 
-"@nestjs/testing@^10.0.0":
+"@nestjs/testing@^10", "@nestjs/testing@^10.0.0":
   version "10.4.20"
   resolved "https://registry.npmjs.org/@nestjs/testing/-/testing-10.4.20.tgz"
   integrity sha512-nMkRDukDKskdPruM6EsgMq7yJua+CPZM6I6FrLP8yXw8BiVSPv9Nm0CtcGGwt3kgZF9hfxKjGqLjsvVBsv6Vfw==

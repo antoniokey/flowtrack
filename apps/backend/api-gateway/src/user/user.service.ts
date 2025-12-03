@@ -6,7 +6,7 @@ import { User, WithoutPasswordUser } from '@flowtrack/types';
 
 import { firstValueFrom } from 'rxjs';
 
-import { USER_MICROSERVICE } from 'src/core/constants/microservices';
+import { USER_MICROSERVICE } from '@flowtrack/constants';
 
 @Injectable()
 export class UserService {

@@ -9,7 +9,7 @@ export interface LogEventContext {
 }
 
 export interface LogEvent {
-  level: LogEventLevel;
+  level: LogEventLevel | null;
   environment: LogEventEnvironment;
   service: string;
   operation: string;

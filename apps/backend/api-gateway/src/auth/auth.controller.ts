@@ -14,10 +14,13 @@ import {
 } from '@nestjs/swagger';
 
 import { TokenType } from '@flowtrack/constants';
-import { LogEventContext as ILogEventContext } from '@flowtrack/types';
+import {
+  ErrorDto,
+  LogEventContext as ILogEventContext,
+  SuccessResponseDto,
+} from '@flowtrack/types';
 
 import { Request, Response } from 'express';
-import { Observable } from 'rxjs';
 
 import { LogEventContext } from 'src/core/decorators/log-event-context.decorator';
 import { SessionUserGuard } from 'src/core/guards/session-user.guard';
@@ -25,37 +28,26 @@ import { Public } from 'src/core/decorators/public.decorator';
 import { RefreshTokenGuard } from 'src/core/guards/refresh-token.guard';
 
 import { AuthService } from './auth.service';
-import {
-  LoginUserResponseDto,
-  LoginUserBadRequestDto,
-  CreateUserBadRequestDto,
-  CreateUserResponseDto,
-  LoginUserDto,
-  CreateUserDto,
-  LogoutUserDtoResponse,
-  LogoutUserBadRequestDto,
-  RefreshTokenDtoResponse,
-  RefreshTokenBadRequestDto,
-} from './dto/auth.dto';
-import { CreateUserResponse } from './types/auth.types';
+import { LoginRequestDto } from './dto/login.dto';
+import { CreateRequestUserDto } from './dto/create-user.dto';
 
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
-  @ApiOkResponse({ description: 'Login success', type: LoginUserResponseDto })
+  @ApiOkResponse({ description: 'Login success', type: SuccessResponseDto })
   @ApiBadRequestResponse({
     description: 'Login failed',
-    type: LoginUserBadRequestDto,
+    type: ErrorDto,
   })
   @HttpCode(200)
   @Public()
   @Post('login')
   async login(
     @LogEventContext() logEventContext: ILogEventContext,
-    @Body() user: LoginUserDto,
+    @Body() user: LoginRequestDto,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<LoginUserResponseDto> {
+  ): Promise<SuccessResponseDto> {
     const loginUserResponse = await this.authService.login(
       user,
       logEventContext,
@@ -77,28 +69,31 @@ export class AuthController {
 
   @ApiCreatedResponse({
     description: 'Register success',
-    type: CreateUserResponseDto,
+    type: SuccessResponseDto,
   })
   @ApiBadRequestResponse({
     description: 'Register failed',
-    type: CreateUserBadRequestDto,
+    type: ErrorDto,
   })
   @Public()
   @Post('register')
-  register(
+  async register(
     @LogEventContext() logEventContext: ILogEventContext,
-    @Body() user: CreateUserDto,
-  ): Observable<CreateUserResponse> {
-    return this.authService.register(user, logEventContext);
+    @Body() user: CreateRequestUserDto,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<SuccessResponseDto> {
+    await this.authService.register(user, logEventContext);
+
+    return response.json({ ok: true });
   }
 
   @ApiCreatedResponse({
     description: 'Logout success',
-    type: LogoutUserDtoResponse,
+    type: SuccessResponseDto,
   })
   @ApiBadRequestResponse({
     description: 'Logout failed',
-    type: LogoutUserBadRequestDto,
+    type: ErrorDto,
   })
   @HttpCode(200)
   @Post('logout')
@@ -107,7 +102,7 @@ export class AuthController {
     @LogEventContext() logEventContext: ILogEventContext,
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<LogoutUserDtoResponse> {
+  ): Promise<SuccessResponseDto> {
     await this.authService.logout(request.user.id, logEventContext);
 
     response.clearCookie(TokenType.ACCESS_TOKEN);
@@ -118,11 +113,11 @@ export class AuthController {
 
   @ApiCreatedResponse({
     description: 'Refresh token success',
-    type: RefreshTokenDtoResponse,
+    type: SuccessResponseDto,
   })
   @ApiBadRequestResponse({
     description: 'Refresh token failed',
-    type: RefreshTokenBadRequestDto,
+    type: ErrorDto,
   })
   @HttpCode(200)
   @Post('refresh')
@@ -131,7 +126,7 @@ export class AuthController {
     @LogEventContext() logEventContext: ILogEventContext,
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<RefreshTokenDtoResponse> {
+  ): Promise<SuccessResponseDto> {
     const refreshTokenResponse = await this.authService.refreshToken(
       request.refreshToken,
       logEventContext,

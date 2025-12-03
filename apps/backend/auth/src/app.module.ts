@@ -4,8 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientRMQ, ClientsModule, Transport } from '@nestjs/microservices';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
+import { LOGGER_MICROSERVICE } from '@flowtrack/constants';
+
 import { AuthModule } from './auth/auth.module';
-import { LOGGER_MICROSERVICE } from './core/constants/constants';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { Session } from './auth/entities/session';
 

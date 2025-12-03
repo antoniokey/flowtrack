@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { UserModule } from './users/users.module';
+import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 
 @Module({
@@ -22,7 +22,7 @@ import { User } from './users/entities/user.entity';
         synchronize: true,
       }),
     }),
-    UserModule,
+    UsersModule,
   ],
 })
 export class AppModule { }

@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 
 import { TokenType } from '@flowtrack/constants';
 
-import { IS_PUBLIC_KEY } from '../constants/api.constants';
+import { IS_PUBLIC_KEY } from '../constants/session';
 import { parseCookieFromHeader } from '../utils/parseCookieFromHeader';
 
 @Injectable()

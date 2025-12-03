@@ -8,7 +8,7 @@ import { DeleteResult, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { firstValueFrom } from 'rxjs';
 
-import { TokenType } from '@flowtrack/constants';
+import { TokenType, USER_MICROSERVICE } from '@flowtrack/constants';
 import {
   CreateUserResponse,
   LoginResponse,
@@ -17,7 +17,6 @@ import {
 } from '@flowtrack/types';
 
 import { CreateUserDto } from 'src/auth/dto/create-user.dto';
-import { USER_MICROSERVICE } from 'src/core/constants/constants';
 
 import { Session } from './entities/session';
 
