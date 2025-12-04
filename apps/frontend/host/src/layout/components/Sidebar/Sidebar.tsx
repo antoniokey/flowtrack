@@ -12,10 +12,13 @@ import styles from './Sidebar.module.scss';
 import { SIDEBAR_OPTIONS } from './constants';
 import { SidebarOption } from './types';
 
-const LayoutSidebar = () => {
-  const { t } = useTranslation();
+interface Props {
+  isSidebarOpened: boolean;
+  setIsSidebarOpened: (isSidebarOpened: boolean) => void;
+}
 
-  const [isSidebarOpened, setIsSidebarOpened] = useState(true);
+const LayoutSidebar = ({ isSidebarOpened, setIsSidebarOpened }: Props) => {
+  const { t } = useTranslation();
 
   const pathname = usePathname();
   const router = useRouter();
