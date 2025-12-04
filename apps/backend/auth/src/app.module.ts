@@ -12,19 +12,25 @@ import { Session } from './auth/entities/session';
 
 @Module({
   imports: [
-    ClientsModule.register([
-      {
-        name: LOGGER_MICROSERVICE,
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://localhost:5672'],
-          queue: 'log_events',
-          queueOptions: {
-            durable: false,
-          },
+    ClientsModule.registerAsync({
+      clients: [
+        {
+          name: LOGGER_MICROSERVICE,
+          imports: [ConfigModule],
+          useFactory: (configService: ConfigService) => ({
+            transport: Transport.RMQ,
+            options: {
+              urls: [configService.get<string>('RMQ_URL')],
+              queue: configService.get<string>('LOGGER_MICROSERVICE_RMQ_QUEUE'),
+              queueOptions: {
+                durable: false,
+              },
+            },
+          }),
+          inject: [ConfigService],
         },
-      },
-    ]),
+      ],
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

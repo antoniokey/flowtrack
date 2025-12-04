@@ -9,8 +9,8 @@ async function bootstrap() {
     {
       transport: Transport.RMQ,
       options: {
-        urls: ['amqp://localhost:5672'],
-        queue: 'finance_queue',
+        urls: [process.env.RMQ_URL],
+        queue: process.env.FINANCE_MICROSERVICE_RMQ_QUEUE,
         queueOptions: {
           durable: false,
         },

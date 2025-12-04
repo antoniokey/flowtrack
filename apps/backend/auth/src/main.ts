@@ -10,8 +10,8 @@ async function bootstrap() {
     {
       transport: Transport.RMQ,
       options: {
-        urls: ['amqp://localhost:5672'],
-        queue: 'auth_queue',
+        urls: [process.env.RMQ_URL],
+        queue: process.env.AUTH_MICROSERVICE_RMQ_QUEUE,
         queueOptions: {
           durable: false,
         },

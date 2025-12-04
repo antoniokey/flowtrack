@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { FINANCE_MICROSERVICE } from '@flowtrack/constants';
 
@@ -8,19 +9,27 @@ import { FinanceController } from './finance.controller';
 
 @Module({
   imports: [
-    ClientsModule.register([
-      {
-        name: FINANCE_MICROSERVICE,
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://localhost:5672'],
-          queue: 'finance_queue',
-          queueOptions: {
-            durable: false,
-          },
+    ClientsModule.registerAsync({
+      clients: [
+        {
+          name: FINANCE_MICROSERVICE,
+          imports: [ConfigModule],
+          useFactory: (configService: ConfigService) => ({
+            transport: Transport.RMQ,
+            options: {
+              urls: [configService.get<string>('RMQ_URL')],
+              queue: configService.get<string>(
+                'FINANCE_MICROSERVICE_RMQ_QUEUE',
+              ),
+              queueOptions: {
+                durable: false,
+              },
+            },
+          }),
+          inject: [ConfigService],
         },
-      },
-    ]),
+      ],
+    }),
   ],
   controllers: [FinanceController],
   providers: [FinanceService],
