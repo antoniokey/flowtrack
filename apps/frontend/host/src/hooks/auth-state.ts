@@ -4,7 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
 import { useUserStore } from '@flowtrack/store';
-import { useApiClient } from '@flowtrack/api';
+import { useApiClient } from '@flowtrack/libs-frontend';
 
 interface Props {
   isClient: boolean;

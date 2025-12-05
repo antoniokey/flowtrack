@@ -8,7 +8,7 @@ import { useMutation } from '@tanstack/react-query';
 import Modal from '@flowtrack/ui/components/Modal/Modal';
 import TextInputField from '@flowtrack/ui/components/TextInputField/TextInputField';
 import Button from '@flowtrack/ui/components/Button/Button';
-import { useApiClient } from '@flowtrack/api';
+import { useApiClient } from '@flowtrack/libs-frontend';
 
 import styles from './RegisterModal.module.scss';
 import { ButtonSize, ButtonType, ButtonVariant } from '../../../../../../packages/ui/src/components/Button/constants';

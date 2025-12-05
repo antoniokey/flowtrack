@@ -1,5 +1,5 @@
 {
-  "name": "@flowtrack/backend",
+  "name": "@flowtrack/libs-frontend",
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
@@ -10,8 +10,7 @@
   },
   "dependencies": {
     "@flowtrack/typescript-config": "*",
-    "@nestjs/common": "^10",
-    "@nestjs/microservices": "^10"
+    "react": "^19.2.0"
   },
   "keywords": [],
   "author": "",

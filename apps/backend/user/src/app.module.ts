@@ -5,7 +5,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ClientRMQ, ClientsModule, Transport } from '@nestjs/microservices';
 
 import { LOGGER_MICROSERVICE } from '@flowtrack/constants';
-import { LoggerInterceptor } from '@flowtrack/backend';
+import { LoggerInterceptor } from '@flowtrack/libs-backend';
 
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
