@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  CallHandler,
-  ExecutionContext,
-  NestInterceptor,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 
 import { LogEvent } from '@flowtrack/types';
@@ -11,17 +6,20 @@ import { LogEventEnvironment, LogEventLevel } from '@flowtrack/constants';
 
 import { catchError, Observable, tap } from 'rxjs';
 
-export class AuthInterceptor implements NestInterceptor {
-  constructor(private readonly loggerMicroservice: ClientProxy) { }
+export class LoggerInterceptor implements NestInterceptor {
+  constructor(
+    private readonly loggerMicroservice: ClientProxy,
+    private readonly serviceName: string,
+  ) { }
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
     const ctx = context.switchToRpc();
     const payload = ctx.getData();
 
     const logEvent: LogEvent = {
       level: null,
       environment: process.env.NODE_ENV as LogEventEnvironment,
-      service: 'auth-service',
+      service: this.serviceName,
       operation: payload.logEvent.operation || 'unknown',
       userId: payload.data.userId || null,
       data: payload.data,

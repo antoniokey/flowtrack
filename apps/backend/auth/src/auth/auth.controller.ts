@@ -21,6 +21,7 @@ export class AuthController {
     const user = await this.authService.validateUser(
       payload.data.email,
       payload.data.password,
+      payload.logEvent.context,
     );
 
     return this.authService.login(user, payload.logEvent.context.ip);
@@ -30,7 +31,7 @@ export class AuthController {
   async register(
     @Payload() payload: CreateUserDto,
   ): Promise<CreateUserResponse> {
-    return this.authService.register(payload);
+    return this.authService.register(payload, payload.logEvent.context);
   }
 
   @MessagePattern('logout')
@@ -42,6 +43,9 @@ export class AuthController {
   async refreshToken(
     @Payload() payload: RefreshTokenDto,
   ): Promise<LoginResponse> {
-    return this.authService.refreshToken(payload.data.refresh_token);
+    return this.authService.refreshToken(
+      payload.data.refresh_token,
+      payload.logEvent.context,
+    );
   }
 }

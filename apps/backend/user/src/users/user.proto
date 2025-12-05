@@ -7,14 +7,24 @@ service UsersService {
   rpc CreateOne (UserCreateOne) returns (UserCreateOneResponse) {}
 }
 
-message UserFindOneBy {
+message UserFindOneByData {
   string email = 1;
 }
 
-message UserCreateOne {
+message UserFindOneBy {
+  UserFindOneByData data = 1;
+  LogEvent logEvent = 2;
+}
+
+message UserCreateOneData {
   string email = 1;
   string name = 2;
   string password = 3;
+}
+
+message UserCreateOne {
+  UserCreateOneData data = 1;
+  LogEvent logEvent = 2;
 }
 
 message UserFindOneByResponse {
@@ -29,3 +39,17 @@ message UserCreateOneResponse {
   string email = 2;
   string name = 3;
 }
+
+message LogEventContext {
+  string ip = 1;
+  string method = 2;
+  string path = 3;
+  string userAgent = 4;
+  string correlationId = 5;
+}
+
+message LogEvent {
+  string operation = 1;
+  LogEventContext context = 2;
+}
+  

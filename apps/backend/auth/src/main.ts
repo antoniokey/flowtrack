@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 import { AppModule } from './app.module';
-import { AuthRpcExceptionFilter } from './core/exception-filters/auth-rpc-exception-filter';
+import { AuthRpcExceptionFilter } from './core/filters/auth-rpc-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(

@@ -8,6 +8,8 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { User } from './entities/user.entity';
+import { FindOneByDto } from './dto/find-one-by.dto';
+import { CreateOneDto } from './dto/create-one.dto';
 
 @Injectable()
 export class UsersService {
@@ -15,8 +17,8 @@ export class UsersService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) { }
 
-  async findOneBy(filter: unknown): Promise<IUser> {
-    const user = await this.userRepository.findOneBy(filter);
+  async findOneBy(findOneByDto: FindOneByDto): Promise<IUser> {
+    const user = await this.userRepository.findOneBy(findOneByDto.data);
 
     if (!user) {
       throw new RpcException(
@@ -30,8 +32,8 @@ export class UsersService {
     return user;
   }
 
-  async createOne(user: IUser): Promise<WithoutPasswordUser> {
-    const { email, name, password } = user;
+  async createOne(createOneDto: CreateOneDto): Promise<WithoutPasswordUser> {
+    const { email, name, password } = createOneDto.data;
 
     const existingUser = await this.userRepository.exists({
       where: { email },

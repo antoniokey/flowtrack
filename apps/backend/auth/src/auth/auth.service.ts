@@ -11,6 +11,7 @@ import { firstValueFrom } from 'rxjs';
 import { TokenType, USER_MICROSERVICE } from '@flowtrack/constants';
 import {
   CreateUserResponse,
+  LogEventContext,
   LoginResponse,
   User,
   WithoutPasswordUser,
@@ -33,26 +34,36 @@ export class AuthService {
     this.usersService = this.userMicroservice.getService('UsersService');
   }
 
-  async validateUser(email: string, password: string): Promise<User> {
+  async validateUser(
+    email: string,
+    password: string,
+    logEventContext: LogEventContext,
+  ): Promise<User> {
     try {
       const user: User = await firstValueFrom(
-        this.usersService.findOneBy({ email }),
+        this.usersService.findOneBy({
+          data: { email },
+          logEvent: {
+            operation: 'findOneBy',
+            context: logEventContext,
+          },
+        }),
       );
 
       const isPasswordMatch = bcrypt.compareSync(password, user.password);
 
       if (!isPasswordMatch) {
-        throw new RpcException({
-          error: {
+        throw new RpcException(
+          JSON.stringify({
             statusCode: 400,
             message: 'Password is incorrect',
-          },
-        });
+          }),
+        );
       }
 
       return user;
     } catch (error) {
-      throw new RpcException(JSON.parse(error.details));
+      throw new RpcException(JSON.parse(error.error ?? error.details));
     }
   }
 
@@ -70,11 +81,20 @@ export class AuthService {
     };
   }
 
-  async register(payload: CreateUserDto): Promise<CreateUserResponse> {
+  async register(
+    payload: CreateUserDto,
+    logEventContext: LogEventContext,
+  ): Promise<CreateUserResponse> {
     try {
-      return this.usersService.createOne(payload.data);
+      return this.usersService.createOne({
+        data: { ...payload.data },
+        logEvent: {
+          operation: 'createOne',
+          context: logEventContext,
+        },
+      });
     } catch (error) {
-      throw new RpcException(JSON.parse(error.details));
+      throw new RpcException(JSON.parse(error.error ?? error.details));
     }
   }
 
@@ -86,61 +106,74 @@ export class AuthService {
     }
   }
 
-  async refreshToken(refresh_token: string): Promise<LoginResponse> {
-    const refreshTokenPayload = this.jwtService.verify(refresh_token);
+  async refreshToken(
+    refresh_token: string,
+    logEventContext: LogEventContext,
+  ): Promise<LoginResponse> {
+    try {
+      const refreshTokenPayload = this.jwtService.verify(refresh_token);
 
-    const userId = +refreshTokenPayload.sub;
+      const userId = +refreshTokenPayload.sub;
 
-    const session = await this.sessionRepository.findOneBy({ userId });
+      const session = await this.sessionRepository.findOneBy({ userId });
 
-    if (!session) {
-      throw new RpcException({
-        error: {
-          statusCode: 400,
-          message: 'Session not found',
-        },
-      });
+      if (!session) {
+        throw new RpcException(
+          JSON.stringify({
+            statusCode: 400,
+            message: 'Session not found',
+          }),
+        );
+      }
+
+      const isSessionOk = await bcrypt.compare(
+        refresh_token,
+        session.refreshToken,
+      );
+
+      if (!isSessionOk) {
+        throw new RpcException(
+          JSON.stringify({
+            statusCode: 400,
+            message: 'Refresh token in not valid',
+          }),
+        );
+      }
+
+      const user: User = await firstValueFrom(
+        this.usersService.findOneBy({
+          data: { id: userId },
+          logEvent: {
+            operation: 'findOneBy',
+            context: logEventContext,
+          },
+        }),
+      );
+
+      if (!user) {
+        throw new RpcException(
+          JSON.stringify({
+            statusCode: 400,
+            message: 'User not found',
+          }),
+        );
+      }
+
+      const newAccessToken = this.generateToken(TokenType.ACCESS_TOKEN, user);
+      const newRefreshToken = this.generateToken(TokenType.REFRESH_TOKEN, user);
+
+      session.refreshToken = await bcrypt.hash(newRefreshToken, 10);
+      session.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+      this.sessionRepository.save(session);
+
+      return {
+        access_token: newAccessToken,
+        refresh_token: newRefreshToken,
+      };
+    } catch (error) {
+      throw new RpcException(JSON.parse(error.error ?? error.details));
     }
-
-    const isSessionOk = await bcrypt.compare(
-      refresh_token,
-      session.refreshToken,
-    );
-
-    if (!isSessionOk) {
-      throw new RpcException({
-        error: {
-          statusCode: 400,
-          message: 'Refresh token in not valid',
-        },
-      });
-    }
-
-    const user: User = await firstValueFrom(
-      this.usersService.findOneBy({ id: userId }),
-    );
-
-    if (!user) {
-      throw new RpcException({
-        error: {
-          statusCode: 400,
-          message: 'User not found',
-        },
-      });
-    }
-
-    const newAccessToken = this.generateToken(TokenType.ACCESS_TOKEN, user);
-    const newRefreshToken = this.generateToken(TokenType.REFRESH_TOKEN, user);
-
-    session.refreshToken = await bcrypt.hash(newRefreshToken, 10);
-    session.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-    this.sessionRepository.save(session);
-
-    return {
-      access_token: newAccessToken,
-      refresh_token: newRefreshToken,
-    };
   }
 
   private async createSession(

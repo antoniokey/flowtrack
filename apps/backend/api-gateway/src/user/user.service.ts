@@ -2,7 +2,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 
-import { User, WithoutPasswordUser } from '@flowtrack/types';
+import { User, WithoutPasswordUser, LogEventContext } from '@flowtrack/types';
 
 import { firstValueFrom } from 'rxjs';
 
@@ -18,9 +18,18 @@ export class UserService {
     this.usersService = this.userMicroservice.getService('UsersService');
   }
 
-  async getMe(id: number): Promise<WithoutPasswordUser> {
+  async getMe(
+    id: number,
+    logEventContext: LogEventContext,
+  ): Promise<WithoutPasswordUser> {
     const user: User = await firstValueFrom(
-      this.usersService.findOneBy({ id }),
+      this.usersService.findOneBy({
+        data: { id },
+        logEvent: {
+          operation: 'findOneBy',
+          context: logEventContext,
+        },
+      }),
     );
 
     const { password, ...restUser } = user;

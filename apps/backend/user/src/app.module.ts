@@ -1,12 +1,36 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ClientRMQ, ClientsModule, Transport } from '@nestjs/microservices';
+
+import { LOGGER_MICROSERVICE } from '@flowtrack/constants';
+import { LoggerInterceptor } from '@flowtrack/backend';
 
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 
 @Module({
   imports: [
+    ClientsModule.registerAsync({
+      clients: [
+        {
+          name: LOGGER_MICROSERVICE,
+          imports: [ConfigModule],
+          useFactory: (configService: ConfigService) => ({
+            transport: Transport.RMQ,
+            options: {
+              urls: [configService.get<string>('RMQ_URL')],
+              queue: configService.get<string>('LOGGER_MICROSERVICE_RMQ_QUEUE'),
+              queueOptions: {
+                durable: false,
+              },
+            },
+          }),
+          inject: [ConfigService],
+        },
+      ],
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -23,6 +47,14 @@ import { User } from './users/entities/user.entity';
       }),
     }),
     UsersModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useFactory: (loggerMicroservice: ClientRMQ) =>
+        new LoggerInterceptor(loggerMicroservice, 'user-service'),
+      inject: [LOGGER_MICROSERVICE],
+    },
   ],
 })
 export class AppModule { }

@@ -5,9 +5,9 @@ import { ClientRMQ, ClientsModule, Transport } from '@nestjs/microservices';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 import { LOGGER_MICROSERVICE } from '@flowtrack/constants';
+import { LoggerInterceptor } from '@flowtrack/backend';
 
 import { AuthModule } from './auth/auth.module';
-import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { Session } from './auth/entities/session';
 
 @Module({
@@ -52,7 +52,7 @@ import { Session } from './auth/entities/session';
     {
       provide: APP_INTERCEPTOR,
       useFactory: (loggerMicroservice: ClientRMQ) =>
-        new AuthInterceptor(loggerMicroservice),
+        new LoggerInterceptor(loggerMicroservice, 'auth-service'),
       inject: [LOGGER_MICROSERVICE],
     },
   ],
