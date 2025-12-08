@@ -13,6 +13,7 @@ async function bootstrap() {
       options: {
         package: 'user',
         protoPath: path.join(__dirname, '../src/users/user.proto'),
+        url: process.env.USER_MICROSERVICE_GRPC_URL,
       },
     },
   );

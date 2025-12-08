@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { USER_MICROSERVICE } from '@flowtrack/constants';
+import { USER_MICROSERVICE, ENVIRONMENT_VARIABLES } from '@flowtrack/constants';
 
 import * as path from 'path';
 
@@ -15,16 +15,27 @@ import { Session } from './entities/session';
 
 @Module({
   imports: [
-    ClientsModule.register([
-      {
-        name: USER_MICROSERVICE,
-        transport: Transport.GRPC,
-        options: {
-          package: 'user',
-          protoPath: path.join(__dirname, '../../../user/src/users/user.proto'),
+    ClientsModule.registerAsync({
+      clients: [
+        {
+          name: USER_MICROSERVICE,
+          useFactory: (configService: ConfigService) => ({
+            transport: Transport.GRPC,
+            options: {
+              package: 'user',
+              protoPath: path.join(
+                __dirname,
+                '../../../user/src/users/user.proto',
+              ),
+              url: configService.get<string>(
+                ENVIRONMENT_VARIABLES.USER_MICROSERVICE_GRPC_URL,
+              ),
+            },
+          }),
+          inject: [ConfigService],
         },
-      },
-    ]),
+      ],
+    }),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({

@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package auth;
+
+service AuthService {
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc Register (RegisterRequest) returns (RegisterResponse);
+  rpc Logout (LogoutRequest) returns (LogoutResponse);
+  rpc RefreshToken (RefreshTokenRequest) returns (LoginResponse);
+}
+
+message LoginRequest {
+  LoginRequestData data = 1;
+  LogEvent logEvent = 2;
+}
+
+message LoginRequestData {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message RegisterRequest {
+  RegisterRequestData data = 1;
+  LogEvent logEvent = 2;
+}
+
+message RegisterRequestData {
+  string email = 1;
+  string password = 2;
+  string name = 3;
+}
+
+message RegisterResponse {
+  string email = 1;
+  string name = 2;
+  string id = 3;
+}
+
+message LogoutRequest {
+  LogoutRequestData data = 1;
+  LogEvent logEvent = 2;
+}
+
+message LogoutRequestData {
+  string userId = 1;
+}
+
+message LogoutResponse {
+  string email = 1;
+  string name = 2;
+  string id = 3;
+}
+
+message RefreshTokenRequest {
+  RefreshTokenRequestData data = 1;
+  LogEvent logEvent = 2;
+}
+
+message RefreshTokenRequestData {
+  string refresh_token = 1;
+}
+
+message LogEventContext {
+  string ip = 1;
+  string method = 2;
+  string path = 3;
+  string userAgent = 4;
+  string correlationId = 5;
+}
+
+message LogEvent {
+  string operation = 1;
+  LogEventContext context = 2;
+}

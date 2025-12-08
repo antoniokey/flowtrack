@@ -1,5 +1,5 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { ClientRMQ } from '@nestjs/microservices';
+import { ClientGrpc } from '@nestjs/microservices';
 
 import { TokenType, AUTH_MICROSERVICE } from '@flowtrack/constants';
 import {
@@ -16,17 +16,21 @@ import { CreateRequestUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly authService: any;
+
   constructor(
-    @Inject(AUTH_MICROSERVICE) private readonly authMicroservice: ClientRMQ,
-  ) { }
+    @Inject(AUTH_MICROSERVICE) private readonly authMicroservice: ClientGrpc,
+  ) {
+    this.authService = this.authMicroservice.getService('AuthService');
+  }
 
   login(
     user: LoginRequestDto,
     logEventContext: LogEventContext,
   ): Promise<LoginResponse> {
     return firstValueFrom(
-      this.authMicroservice
-        .send('login', {
+      this.authService
+        .login({
           data: { ...user },
           logEvent: {
             operation: 'login',
@@ -46,8 +50,8 @@ export class AuthService {
     logEventContext: LogEventContext,
   ): Promise<CreateUserResponse> {
     return firstValueFrom(
-      this.authMicroservice
-        .send('register', {
+      this.authService
+        .register({
           data: { ...user },
           logEvent: {
             operation: 'regiter',
@@ -64,8 +68,8 @@ export class AuthService {
 
   logout(userId: number, logEventContext: LogEventContext): Promise<void> {
     return firstValueFrom(
-      this.authMicroservice
-        .send('logout', {
+      this.authService
+        .logout({
           data: { userId },
           logEvent: {
             operation: 'logout',
@@ -85,8 +89,8 @@ export class AuthService {
     logEventContext: LogEventContext,
   ): Promise<LoginResponse> {
     return firstValueFrom(
-      this.authMicroservice
-        .send('refresh_token', {
+      this.authService
+        .refreshToken({
           data: { refresh_token },
           logEvent: {
             operation: 'refreshToken',

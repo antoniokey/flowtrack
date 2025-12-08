@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 
-import { AUTH_MICROSERVICE } from '@flowtrack/constants';
+import * as path from 'path';
+
+import { AUTH_MICROSERVICE, ENVIRONMENT_VARIABLES } from '@flowtrack/constants';
 
 import { SessionUserGuard } from 'src/core/guards/session-user.guard';
 import { RefreshTokenGuard } from 'src/core/guards/refresh-token.guard';
@@ -17,15 +19,17 @@ import { AuthService } from './auth.service';
       clients: [
         {
           name: AUTH_MICROSERVICE,
-          imports: [ConfigModule],
           useFactory: (configService: ConfigService) => ({
-            transport: Transport.RMQ,
+            transport: Transport.GRPC,
             options: {
-              urls: [configService.get<string>('RMQ_URL')],
-              queue: configService.get<string>('AUTH_MICROSERVICE_RMQ_QUEUE'),
-              queueOptions: {
-                durable: false,
-              },
+              package: 'auth',
+              protoPath: path.join(
+                __dirname,
+                '../../../auth/src/auth/auth.proto',
+              ),
+              url: configService.get<string>(
+                ENVIRONMENT_VARIABLES.AUTH_MICROSERVICE_GRPC_URL,
+              ),
             },
           }),
           inject: [ConfigService],
@@ -35,7 +39,7 @@ import { AuthService } from './auth.service';
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
+        secret: configService.get(ENVIRONMENT_VARIABLES.JWT_SECRET),
       }),
     }),
   ],

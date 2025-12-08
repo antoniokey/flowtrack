@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { GrpcMethod, Payload } from '@nestjs/microservices';
 
 import { CreateUserResponse, LoginResponse } from '@flowtrack/types';
 
@@ -16,7 +16,7 @@ import { RefreshTokenDto } from './dto/refresh-token';
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
-  @MessagePattern('login')
+  @GrpcMethod('AuthService', 'Login')
   async login(@Payload() payload: LoginUserDto): Promise<LoginResponse> {
     const user = await this.authService.validateUser(
       payload.data.email,
@@ -27,19 +27,19 @@ export class AuthController {
     return this.authService.login(user, payload.logEvent.context.ip);
   }
 
-  @MessagePattern('register')
+  @GrpcMethod('AuthService', 'Register')
   async register(
     @Payload() payload: CreateUserDto,
   ): Promise<CreateUserResponse> {
     return this.authService.register(payload, payload.logEvent.context);
   }
 
-  @MessagePattern('logout')
+  @GrpcMethod('AuthService', 'Logout')
   async logout(@Payload() payload: LogoutUserDto): Promise<DeleteResult> {
     return this.authService.logout(payload.data.userId);
   }
 
-  @MessagePattern('refresh_token')
+  @GrpcMethod('AuthService', 'RefreshToken')
   async refreshToken(
     @Payload() payload: RefreshTokenDto,
   ): Promise<LoginResponse> {

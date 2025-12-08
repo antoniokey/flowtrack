@@ -52,4 +52,3 @@ message LogEvent {
   string operation = 1;
   LogEventContext context = 2;
 }
-  
