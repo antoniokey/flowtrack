@@ -30,7 +30,9 @@ import { RefreshTokenGuard } from 'src/core/guards/refresh-token.guard';
 import { AuthService } from './auth.service';
 import { LoginRequestDto } from './dto/login.dto';
 import { CreateRequestUserDto } from './dto/create-user.dto';
+import { Throttle } from '@nestjs/throttler';
 
+@Throttle({ default: { limit: 10, ttl: 60000 } })
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
@@ -40,8 +42,8 @@ export class AuthController {
     description: 'Login failed',
     type: ErrorDto,
   })
-  @HttpCode(200)
   @Public()
+  @HttpCode(200)
   @Post('login')
   async login(
     @LogEventContext() logEventContext: ILogEventContext,
