@@ -3,7 +3,8 @@
     "logout": "Logout"
   },
   "sidebar_options": {
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "finance": "Finance"
   },
   "logout": {
     "modal": {

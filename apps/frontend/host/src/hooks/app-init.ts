@@ -22,9 +22,9 @@ export function useAppInit() {
 
     setIsLoggedIn(isLoggedIn);
 
-    if (isLoggedIn) {
+    if (isLoggedIn && pathname === '/') {
       router.replace('/dashboard');
-    } else {
+    } else if (!isLoggedIn && pathname !== '/') {
       router.replace('/');
     }
   }, [pathname, isClient, isLoggedIn]);
