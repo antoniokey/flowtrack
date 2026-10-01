@@ -29,10 +29,9 @@ import { RefreshTokenGuard } from 'src/core/guards/refresh-token.guard';
 
 import { AuthService } from './auth.service';
 import { LoginRequestDto } from './dto/login.dto';
-import { CreateRequestUserDto } from './dto/create-user.dto';
-import { Throttle } from '@nestjs/throttler';
 
-@Throttle({ default: { limit: 10, ttl: 60000 } })
+import { CreateRequestUserDto } from './dto/create-user.dto';
+
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
@@ -66,7 +65,7 @@ export class AuthController {
       this.authService.getCookieData(TokenType.REFRESH_TOKEN),
     );
 
-    return response.json({ ok: true });
+    return { ok: true };
   }
 
   @ApiCreatedResponse({
@@ -86,7 +85,7 @@ export class AuthController {
   ): Promise<SuccessResponseDto> {
     await this.authService.register(user, logEventContext);
 
-    return response.json({ ok: true });
+    return { ok: true };
   }
 
   @ApiCreatedResponse({
@@ -110,7 +109,7 @@ export class AuthController {
     response.clearCookie(TokenType.ACCESS_TOKEN);
     response.clearCookie(TokenType.REFRESH_TOKEN);
 
-    return response.json({ ok: true });
+    return { ok: true };
   }
 
   @ApiCreatedResponse({
@@ -145,6 +144,6 @@ export class AuthController {
       this.authService.getCookieData(TokenType.REFRESH_TOKEN),
     );
 
-    return response.json({ ok: true });
+    return { ok: true };
   }
 }

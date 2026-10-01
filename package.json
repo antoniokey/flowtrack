@@ -23,5 +23,9 @@
     "apps/backend/*",
     "packages/*",
     "packages/config/*"
-  ]
+  ],
+  "resolutions": {
+    "webpack": "5.102.1",
+    "**/webpack/enhanced-resolve": "5.18.3"
+  }
 }

@@ -15,6 +15,9 @@ async function bootstrap() {
         package: 'auth',
         protoPath: path.join(__dirname, '../src/auth/auth.proto'),
         url: process.env.AUTH_MICROSERVICE_GRPC_URL,
+        loader: {
+          keepCase: true,
+        },
       },
     },
   );

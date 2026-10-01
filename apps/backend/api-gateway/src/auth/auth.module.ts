@@ -30,6 +30,9 @@ import { AuthService } from './auth.service';
               url: configService.get<string>(
                 ENVIRONMENT_VARIABLES.AUTH_MICROSERVICE_GRPC_URL,
               ),
+              loader: {
+                keepCase: true,
+              },
             },
           }),
           inject: [ConfigService],

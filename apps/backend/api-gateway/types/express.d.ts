@@ -5,6 +5,8 @@ declare module 'express' {
       email?: string;
     };
     refreshToken?: string;
+    path?: string;
+    baseUrl?: string;
   }
   interface Response {
     cookie(name: string, value: string, options?: CookieOptions): Response;

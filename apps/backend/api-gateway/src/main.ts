@@ -3,7 +3,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import { doubleCsrf } from 'csrf-csrf';
 
 import { AppModule } from './app.module';
 
@@ -18,13 +17,6 @@ async function bootstrap() {
     credentials: true,
     origin: whitelist,
   });
-
-  const { doubleCsrfProtection } = doubleCsrf({
-    getSecret: () => process.env.CSRF_SECRET,
-    getSessionIdentifier: (req) => req.cookies['session-id'],
-  });
-
-  app.use(doubleCsrfProtection);
 
   const config = new DocumentBuilder()
     .setTitle('Flowtrack API')

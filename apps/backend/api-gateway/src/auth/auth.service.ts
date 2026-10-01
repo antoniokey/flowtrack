@@ -110,15 +110,15 @@ export class AuthService {
 
     const cookieOptions: CookieOptions = {
       secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
+      sameSite: 'lax',
       path: '/',
       httpOnly: true,
     };
 
     if (tokenType === TokenType.ACCESS_TOKEN) {
-      cookieOptions.maxAge = 60 * 60 * 24 * 7;
+      cookieOptions.maxAge = 1000 * 60 * 60 * 24 * 7;
     } else {
-      cookieOptions.maxAge = 60 * 60 * 24 * 7 * 2;
+      cookieOptions.maxAge = 1000 * 60 * 60 * 24 * 7 * 2;
     }
 
     return cookieOptions;

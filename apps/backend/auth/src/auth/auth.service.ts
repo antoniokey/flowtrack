@@ -197,12 +197,12 @@ export class AuthService {
     if (tokenType === TokenType.ACCESS_TOKEN) {
       return this.jwtService.sign(
         { sub: user.id },
-        { expiresIn: 15 * 60 * 1000 },
+        { expiresIn: '15m' },
       );
     } else {
       return this.jwtService.sign(
         { sub: user.id },
-        { expiresIn: 7 * 24 * 60 * 60 * 1000 },
+        { expiresIn: '7d' },
       );
     }
   }
