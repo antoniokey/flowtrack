@@ -1,6 +1,6 @@
 .layout {
   display: grid;
-  grid-template-columns: 285px auto;
+  grid-template-columns: auto 1fr;
   grid-template-rows: 70px auto;
 }
 
@@ -8,9 +8,5 @@
   grid-column: 2;
   grid-row: 2;
   padding: var(--spacing-base-10);
-
-  &.sidebarClosedContent {
-    grid-column: 1 / span 3;
-    margin-left: 70px;
-  }
+  min-width: 0;
 }

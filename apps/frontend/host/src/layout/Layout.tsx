@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react';
-import clsx from 'clsx';
 
 import { AuthContext, IAuthContext } from '@/context/auth.context';
 
@@ -22,9 +21,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
         isLoggedIn
           ? (
             <div className={styles.layout}>
-              <LayoutHeader isSidebarOpened={isSidebarOpened} />
+              <LayoutHeader />
               <LayoutSidebar isSidebarOpened={isSidebarOpened} setIsSidebarOpened={setIsSidebarOpened} />
-              <div className={clsx(styles.layoutContent, { [styles.sidebarClosedContent]: !isSidebarOpened })}>
+              <div className={styles.layoutContent}>
                 {children}
               </div>
             </div>
